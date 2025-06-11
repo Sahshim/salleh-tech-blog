@@ -1,7 +1,11 @@
 ---
-layout: post
-title:  "Hello World: My First Post"
-date:   2025-06-14 09:00:00 +0800
-categories: [intro, personal]
+title: Hello World
+date: 2025-06-14
 ---
-Welcome to Salleh.Cloud! This is my first Jekyll blog post powered by GitHub Pages.
+
+Welcome to my tech blog!
+
+<!--more-->
+
+This is the rest of the post that won't show in preview.
+
