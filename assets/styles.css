@@ -43,3 +43,21 @@ li h3 a {
 li p {
   margin: 0.5rem 0;
 }
+
+section ul {
+  list-style: none;
+  padding: 0;
+}
+
+section li {
+  margin-bottom: 30px;
+}
+
+section h3 a {
+  text-decoration: none;
+  color: #007acc;
+}
+
+section small {
+  color: #777;
+}
