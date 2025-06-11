@@ -3,7 +3,6 @@ description: A tech blog on AI, ML, Cloud, Cybersecurity, and Blockchain.
 theme: minima
 
 show_excerpts: true
-
 plugins:
   - jekyll-feed
 
