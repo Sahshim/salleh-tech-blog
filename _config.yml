@@ -1,6 +1,8 @@
 title: Salleh.Cloud
 description: A tech blog on AI, ML, Cloud, Cybersecurity, and Blockchain.
 show_excerpts: true
+future: true
+
 
 
 plugins:
