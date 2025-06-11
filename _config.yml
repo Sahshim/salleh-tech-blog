@@ -1,0 +1,5 @@
+title: Salleh.Cloud
+description: A blog on AI, ML, Cloud, Cybersecurity, and Blockchain.
+theme: minima
+plugins:
+  - jekyll-feed
