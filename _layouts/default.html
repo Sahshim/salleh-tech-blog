@@ -7,19 +7,26 @@
 
   </head>
   <body>
-    <div class="container">
-    <header>
-      <h1>{{ site.title }}</h1>
-      <p>{{ site.description }}</p>
-    </header>
+  <header>
+    <nav>
+      <a href="{{ '/' | relative_url }}"><img src="{{ '/assets/logo.png' | relative_url }}" alt="Logo" style="height:40px; vertical-align:middle;"></a>
+      <a href="{{ '/' | relative_url }}">Home</a>
+      <a href="/about">About</a>
+      <a href="/blog">Blog</a>
+      <a href="/contact">Contact</a>
+    </nav>
+    <h1>{{ site.title }}</h1>
+    <p>{{ site.description }}</p>
+  </header>
 
-    <main>
-      {{ content }}
-    </main>
+  <main>
+    {{ content }}
+  </main>
 
-    <footer>
-      <p>{{ site.title }} © {{ site.time | date: "%Y" }}</p>
-    </footer>
-  </body>
+  <footer>
+    <p>{{ site.title }} © {{ site.time | date: "%Y" }}</p>
+  </footer>
+</body>
+
 </html>
 
