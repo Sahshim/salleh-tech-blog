@@ -3,7 +3,7 @@ title: "Hello World"
 date: 2025-06-01
 layout: post
 published: true
-image: /assets/images/SallehCloudLogo.png
+image: /assets/SallehCloudLogo.png
 ---
 
 Welcome to my tech blog!
