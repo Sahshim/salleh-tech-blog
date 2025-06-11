@@ -1,6 +1,6 @@
 ---
 title: "Hello World"
-date: 2025-06-14
+date: 2025-06-01
 layout: post
 published: true
 ---
