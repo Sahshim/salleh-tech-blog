@@ -6,3 +6,4 @@ show_excerpts: true
 
 plugins:
   - jekyll-feed
+
