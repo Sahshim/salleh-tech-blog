@@ -1,6 +1,7 @@
 ---
-title: "Your First Post"
+title: My First Post
 date: 2025-06-14
+layout: post
+published: true
 ---
-
-This is the first blog post on Salleh.Cloud. Welcome aboard!
+This is the body content of my first blog post.
