@@ -1,8 +1,11 @@
 title: Salleh.Cloud
 description: A tech blog on AI, ML, Cloud, Cybersecurity, and Blockchain.
-theme: minima
 show_excerpts: true
+
+# Remove the theme line if present:
+# theme: minima
+
+# Add custom includes instead
 plugins:
   - jekyll-feed
-
-
+  - jekyll-seo-tag
