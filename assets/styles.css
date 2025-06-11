@@ -61,3 +61,11 @@ section h3 a {
 section small {
   color: #777;
 }
+
+/* assets/styles.css */
+.post-excerpt {
+  margin-bottom: 2rem;
+}
+.post-excerpt h3 {
+  margin-bottom: 0.3rem;
+}
