@@ -9,6 +9,7 @@ published: true
 Welcome to my tech blog!
 
 <!--more-->
-image: /assets/SallehCloudLogo.png
+![Salleh.Cloud Logo](/assets/images/SallehCloudLogo.png)
+
 This is the rest of the post that won't show in preview.
 
