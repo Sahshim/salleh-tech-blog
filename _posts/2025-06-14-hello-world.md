@@ -1,5 +1,5 @@
 ---
-title: Hello World
+title: "Hello World"
 date: 2025-06-14
 layout: post
 published: true
