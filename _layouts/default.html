@@ -65,6 +65,32 @@ window.onload = function() {
   }
 };
 </script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (!localStorage.getItem("cookieConsent")) {
+      const banner = document.createElement("div");
+      banner.innerHTML = `
+        <div style="
+          position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; 
+          background: rgba(0, 0, 0, 0.85); color: white; 
+          text-align: center; z-index: 9999; font-size: 14px;">
+          This site uses cookies for analytics. 
+          See our <a href='/privacy' style='color:#80d0ff;'>Privacy Policy</a>. 
+          <button id="acceptCookies" style="
+            margin-left: 10px; padding: 6px 12px; 
+            background: #4CAF50; color: white; border: none; cursor: pointer;">
+            Accept
+          </button>
+        </div>
+      `;
+      document.body.appendChild(banner);
+      document.getElementById("acceptCookies").onclick = function () {
+        localStorage.setItem("cookieConsent", "true");
+        banner.remove();
+      };
+    }
+  });
+</script>
 
 </body>
 
