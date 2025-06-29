@@ -37,6 +37,35 @@
   <footer>
     <p>{{ site.title }} © {{ site.time | date: "%Y" }}</p>
   </footer>
+    <!-- Cookie Consent Notice -->
+<div id="cookie-notice" style="
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    z-index: 9999;
+    font-size: 14px;
+    display: none;
+">
+    This site uses cookies for analytics. <button onclick="acceptCookies()" style="margin-left: 10px; padding: 5px 10px;">OK</button>
+</div>
+
+<script>
+function acceptCookies() {
+  document.getElementById("cookie-notice").style.display = "none";
+  localStorage.setItem("cookiesAccepted", "true");
+}
+
+window.onload = function() {
+  if (!localStorage.getItem("cookiesAccepted")) {
+    document.getElementById("cookie-notice").style.display = "block";
+  }
+};
+</script>
+
 </body>
 
 </html>
