@@ -6,6 +6,7 @@ future: true
   url: /privacy/
 - title: ITIL FlashCard
   url: /itil-flashcards/
+baseurl: ""  # if you're using a custom domain like salleh.cloud
 
 
 
