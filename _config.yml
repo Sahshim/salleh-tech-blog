@@ -9,7 +9,6 @@ future: true
 baseurl: ""  # if you're using a custom domain like salleh.cloud
 
 
-
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
