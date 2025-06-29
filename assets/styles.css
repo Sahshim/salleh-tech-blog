@@ -3,7 +3,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 1rem;
-  background-image: url('/assets/images/background.png');
+  background-image: url('/assets/images/SallehCloudWhiteBGFadedFinal.png');
   background-repeat: repeat; /* or 'no-repeat' depending on your image */
   background-size: cover;    /* or 'contain', or 'auto' depending on effect */
   background-attachment: fixed;
