@@ -1,6 +1,7 @@
 ---
 layout: default
 title: ITIL FlashCard
+permalink: /itil-flashcards/
 ---
 
 <h1>ITIL FlashCards</h1>
@@ -22,78 +23,83 @@ title: ITIL FlashCard
   margin: 40px auto;
   max-width: 600px;
 }
-
 #flashcard {
-  width: 100%;
-  padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  min-height: 150px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 40px;
+  min-height: 200px;
   cursor: pointer;
-  background: #f9f9f9;
+  position: relative;
 }
-
 .card-side {
-  display: block;
-  font-size: 18px;
+  font-size: 20px;
 }
-
 .hidden {
   display: none;
 }
-
 .controls {
   margin-top: 20px;
 }
-
-.controls button {
+button {
   margin: 0 10px;
-  padding: 8px 16px;
+  padding: 8px 20px;
   font-size: 16px;
 }
 </style>
 
 <script>
-const cards = [
-  { front: "Acceptance criteria", back: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders. [cite: 3]" },
-  { front: "Agile", back: "An umbrella term for frameworks and techniques that enable collaboration, prioritization, iterative delivery, and timeboxing. [cite: 3]" },
-  { front: "Availability", back: "The ability of an IT service or configuration item to perform its agreed function when required. [cite: 3]" },
-  { front: "Baseline", back: "A report or metric that serves as a starting point against which progress or change can be assessed. [cite: 3]" },
-  { front: "Business case", back: "A justification for expenditure, including costs, benefits, options, risks, and issues. [cite: 3]" },
-  { front: "Change", back: "The addition, modification, or removal of anything that could have an effect on services. [cite: 7]" },
-  { front: "Cloud computing", back: "A model for enabling on-demand network access to a shared pool of configurable resources. [cite: 7]" },
-  { front: "Incident", back: "An unplanned interruption to a service or reduction in service quality. [cite: 15]" },
-  { front: "ITIL", back: "Best-practice guidance for IT service management. [cite: 19]" },
-  { front: "Warranty", back: "Assurance that a service will meet agreed requirements. Describes performance, availability, and continuity. [cite: 47]" }
+const flashcards = [
+  {
+    front: "Acceptance criteria",
+    back: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders."
+  },
+  {
+    front: "Agile",
+    back: "An umbrella term for frameworks and techniques like Scrum, Lean, and Kanban that enable collaboration, prioritization, and timeboxed iterative delivery."
+  },
+  {
+    front: "Architecture management practice",
+    back: "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate."
+  },
+  {
+    front: "Availability",
+    back: "The ability of an IT service or other configuration item to perform its agreed function when required."
+  },
+  {
+    front: "Business case",
+    back: "A justification for expenditure of organizational resources, providing info about costs, benefits, risks, and issues."
+  }
+  // Add more flashcards here!
 ];
 
 let currentIndex = 0;
 let flipped = false;
 
-function updateCard() {
-  document.getElementById('card-front').innerText = cards[currentIndex].front;
-  document.getElementById('card-back').innerText = cards[currentIndex].back;
-  document.getElementById('card-front').classList.remove('hidden');
-  document.getElementById('card-back').classList.add('hidden');
+function renderCard() {
+  const front = document.getElementById("card-front");
+  const back = document.getElementById("card-back");
+  front.textContent = flashcards[currentIndex].front;
+  back.textContent = flashcards[currentIndex].back;
+  front.classList.remove("hidden");
+  back.classList.add("hidden");
   flipped = false;
 }
 
 function flipCard() {
   flipped = !flipped;
-  document.getElementById('card-front').classList.toggle('hidden');
-  document.getElementById('card-back').classList.toggle('hidden');
+  document.getElementById("card-front").classList.toggle("hidden", flipped);
+  document.getElementById("card-back").classList.toggle("hidden", !flipped);
 }
 
 function nextCard() {
-  currentIndex = (currentIndex + 1) % cards.length;
-  updateCard();
+  currentIndex = (currentIndex + 1) % flashcards.length;
+  renderCard();
 }
 
 function prevCard() {
-  currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-  updateCard();
+  currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+  renderCard();
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', updateCard);
+document.addEventListener("DOMContentLoaded", renderCard);
 </script>
