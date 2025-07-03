@@ -15,7 +15,7 @@ permalink: /itil-flashcards/
 
 <div class="controls">
   <button onclick="prevCard()">⬅️ Previous</button>
-  <button onclick="flipCard()">🔄 Flip</button>
+  <button onclick="flipCard()">🔁 Flip</button>
   <button onclick="nextCard()">➡️ Next</button>
 </div>
 
@@ -25,29 +25,39 @@ permalink: /itil-flashcards/
     margin: 40px auto;
     max-width: 600px;
   }
-  .card-side {
-    font-size: 1.2rem;
-    padding: 40px;
+
+  #flashcard {
+    border: 2px solid #ccc;
     border-radius: 8px;
+    padding: 30px;
+    height: 180px;
     background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    min-height: 100px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    cursor: pointer;
   }
+
+  .card-side {
+    font-size: 1.2em;
+  }
+
   .hidden {
     display: none;
   }
+
   .controls {
     margin-top: 20px;
     text-align: center;
   }
+
   .controls button {
-    font-size: 16px;
-    margin: 0 10px;
+    margin: 5px;
     padding: 10px 20px;
+    font-size: 1em;
   }
 </style>
 
 <script>
+  let flashcards = [];
   let currentCardIndex = 0;
   let showingFront = true;
 
@@ -85,9 +95,18 @@ permalink: /itil-flashcards/
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    displayCard(currentCardIndex);
+    fetch("{{ '/assets/js/itil_flashcards_data.js' | relative_url }}")
+      .then(response => response.json())
+      .then(data => {
+        flashcards = data.map(card => ({
+          term: card.front,
+          definition: card.back
+        }));
+        displayCard(0);
+      })
+      .catch(error => {
+        console.error("Failed to load flashcards:", error);
+        document.getElementById("card-front").textContent = "⚠️ Failed to load flashcards.";
+      });
   });
 </script>
-
-<script src="{{ '/assets/js/itil_flashcards_data.js' | relative_url }}"></script>
-
