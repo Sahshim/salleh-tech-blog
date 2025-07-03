@@ -2,14 +2,15 @@ title: Salleh.Cloud
 description: A tech blog on Agentic AI, Crypto, Cloud, Cybersecurity, Web3 and Blockchain.
 show_excerpts: true
 future: true
-- title: Privacy
-  url: /privacy/
-- title: ITIL FlashCard
-  url: /itil-flashcards/
-baseurl: ""  # if you're using a custom domain like salleh.cloud
 
+navigation:
+  - title: Privacy
+    url: /privacy/
+  - title: ITIL FlashCard
+    url: /itil-flashcards/
+
+baseurl: "" # if you're using a custom domain like salleh.cloud
 
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
-
