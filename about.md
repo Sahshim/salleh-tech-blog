@@ -6,7 +6,7 @@ permalink: /about/
 
 <img src="/assets/images/SallehOutdoorCV.jpeg" alt="Salleh Outdoor Photo" style="max-width: 300px; border-radius: 8px; margin-bottom: 1rem;">
 
-## About Me
+## About Me(Salleh)
 
 Hi, I’m Salleh – an avid cloud, Linux, and networking enthusiast with a passion for building efficient systems and scalable infrastructure.
 
