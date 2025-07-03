@@ -11,69 +11,76 @@ permalink: /itil-flashcards/
     <div id="card-front" class="card-side"></div>
     <div id="card-back" class="card-side hidden"></div>
   </div>
-</div>
 
-<div class="controls">
-  <button onclick="prevCard()">⬅️ Previous</button>
-  <button onclick="flipCard()">🔁 Flip</button>
-  <button onclick="nextCard()">➡️ Next</button>
+  <div class="controls">
+    <button onclick="prevCard()">⬅ Previous</button>
+    <button onclick="flipCard()">🔁 Flip</button>
+    <button onclick="nextCard()">➡ Next</button>
+  </div>
 </div>
 
 <style>
-  #flashcard-container {
-    text-align: center;
-    margin: 40px auto;
-    max-width: 600px;
-  }
+#flashcard-container {
+  text-align: center;
+  margin: 40px auto;
+  max-width: 600px;
+}
 
-  #flashcard {
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 30px;
-    height: 180px;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    cursor: pointer;
-  }
+#flashcard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  padding: 40px;
+  font-size: 1.2em;
+  cursor: pointer;
+  min-height: 150px;
+}
 
-  .card-side {
-    font-size: 1.2em;
-  }
+.card-side {
+  transition: all 0.3s ease-in-out;
+}
 
-  .hidden {
-    display: none;
-  }
+.hidden {
+  display: none;
+}
 
-  .controls {
-    margin-top: 20px;
-    text-align: center;
-  }
+.controls {
+  margin-top: 20px;
+}
 
-  .controls button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 1em;
-  }
+button {
+  margin: 5px;
+  padding: 10px 16px;
+  font-size: 1em;
+}
 </style>
 
+<!-- Load flashcard data -->
+<script src="{{ '/assets/js/itil_flashcards_data.js' | relative_url }}"></script>
+
 <script>
-  let flashcards = [];
+  let flashcards = window.flashcards || [];
   let currentCardIndex = 0;
   let showingFront = true;
 
+  const front = document.getElementById("card-front");
+  const back = document.getElementById("card-back");
+
   function displayCard(index) {
-    const front = document.getElementById("card-front");
-    const back = document.getElementById("card-back");
-    front.textContent = flashcards[index].term;
-    back.textContent = flashcards[index].definition;
+    if (!flashcards || flashcards.length === 0) {
+      front.textContent = "⚠ Failed to load flashcards.";
+      back.textContent = "";
+      return;
+    }
+
+    front.textContent = flashcards[index].front;
+    back.textContent = flashcards[index].back;
     front.classList.remove("hidden");
     back.classList.add("hidden");
     showingFront = true;
   }
 
   function flipCard() {
-    const front = document.getElementById("card-front");
-    const back = document.getElementById("card-back");
     if (showingFront) {
       front.classList.add("hidden");
       back.classList.remove("hidden");
@@ -95,18 +102,6 @@ permalink: /itil-flashcards/
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    fetch("{{ '/assets/js/itil_flashcards_data.js' | relative_url }}")
-      .then(response => response.json())
-      .then(data => {
-        flashcards = data.map(card => ({
-          term: card.front,
-          definition: card.back
-        }));
-        displayCard(0);
-      })
-      .catch(error => {
-        console.error("Failed to load flashcards:", error);
-        document.getElementById("card-front").textContent = "⚠️ Failed to load flashcards.";
-      });
+    displayCard(currentCardIndex);
   });
 </script>
