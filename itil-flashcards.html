@@ -1,0 +1,87 @@
+---
+layout: default
+title: ITIL FlashCard
+permalink: /itil-flashcards/
+---
+
+<h1>🧠 ITIL FlashCards</h1>
+
+<div id="flashcard-container">
+  <div id="flashcard" onclick="flipCard()">
+    <div id="card-front" class="card-side"></div>
+    <div id="card-back" class="card-side hidden"></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prevCard()">⏪ Previous</button>
+    <button onclick="flipCard()">🔁 Flip</button>
+    <button onclick="nextCard()">⏩ Next</button>
+  </div>
+</div>
+
+<style>
+#flashcard-container {
+  text-align: center;
+  margin: 40px auto;
+  max-width: 600px;
+}
+#flashcard {
+  border: 1px solid #ccc;
+  padding: 40px;
+  cursor: pointer;
+  background-color: #f7f7f7;
+  min-height: 150px;
+  font-size: 18px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.card-side.hidden {
+  display: none;
+}
+.controls button {
+  margin: 5px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+</style>
+
+<script>
+const cards = [
+  { front: "Acceptance criteria", back: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders." },
+  { front: "Agile", back: "A set of frameworks and techniques for collaborative, iterative, and time-boxed development (e.g., Scrum, Lean, Kanban)." },
+  { front: "Availability", back: "The ability of an IT service or other configuration item to perform its agreed function when required." },
+  { front: "Change", back: "The addition, modification, or removal of anything that could have an effect on services." },
+  { front: "Incident", back: "An unplanned interruption to a service or reduction in service quality." },
+  { front: "Service", back: "A means of delivering value to customers by facilitating outcomes they want to achieve without the customer managing specific costs and risks." },
+  // Add more terms...
+];
+
+let currentIndex = 0;
+let showingFront = true;
+
+function updateCard() {
+  document.getElementById('card-front').textContent = cards[currentIndex].front;
+  document.getElementById('card-back').textContent = cards[currentIndex].back;
+  document.getElementById('card-front').classList.remove("hidden");
+  document.getElementById('card-back').classList.add("hidden");
+  showingFront = true;
+}
+
+function flipCard() {
+  showingFront = !showingFront;
+  document.getElementById('card-front').classList.toggle("hidden", !showingFront);
+  document.getElementById('card-back').classList.toggle("hidden", showingFront);
+}
+
+function prevCard() {
+  currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+  updateCard();
+}
+
+function nextCard() {
+  currentIndex = (currentIndex + 1) % cards.length;
+  updateCard();
+}
+
+document.addEventListener('DOMContentLoaded', updateCard);
+</script>
