@@ -3,7 +3,7 @@ layout: default
 title: ITIL FlashCard
 permalink: /itil-flashcards/
 ---
-
+{% include_relative itil-flashcards/index.html %}
 <h1>ITIL FlashCards</h1>
 <div id="flashcard-container">
   <div id="flashcard" onclick="flipCard()">
