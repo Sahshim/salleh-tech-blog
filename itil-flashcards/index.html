@@ -1,88 +1,96 @@
+
 ---
 layout: default
 title: ITIL FlashCard
-
-
+permalink: /itil-flashcards/
 ---
 
 <h1>🧠 ITIL FlashCards</h1>
 
 <div id="flashcard-container">
-  <div id="flashcard" onclick="flipCard()">
-    <div id="card-front" class="card-side"></div>
-    <div id="card-back" class="card-side hidden"></div>
-  </div>
+    <div id="flashcard" onclick="flipCard()">
+        <div id="card-front" class="card-side"></div>
+        <div id="card-back" class="card-side hidden"></div>
+    </div>
 
-  <div class="controls">
-    <button onclick="prevCard()">⏪ Previous</button>
-    <button onclick="flipCard()">🔁 Flip</button>
-    <button onclick="nextCard()">⏩ Next</button>
-  </div>
+    <div class="controls">
+        <button onclick="prevCard()">⬅️ Previous</button>
+        <button onclick="flipCard()">🔄 Flip</button>
+        <button onclick="nextCard()">➡️ Next</button>
+    </div>
 </div>
 
 <style>
 #flashcard-container {
-  text-align: center;
-  margin: 40px auto;
-  max-width: 600px;
+    text-align: center;
+    margin: 40px auto;
+    max-width: 600px;
 }
 #flashcard {
-  border: 1px solid #ccc;
-  padding: 40px;
-  cursor: pointer;
-  background-color: #f7f7f7;
-  min-height: 150px;
-  font-size: 18px;
-  margin-bottom: 20px;
-  border-radius: 8px;
+    width: 100%;
+    height: 200px;
+    perspective: 1000px;
+    cursor: pointer;
 }
-.card-side.hidden {
-  display: none;
+.card-side {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    font-size: 1.2em;
 }
-.controls button {
-  margin: 5px;
-  padding: 8px 14px;
-  font-size: 14px;
+.hidden {
+    display: none;
+}
+.controls {
+    margin-top: 20px;
+}
+button {
+    margin: 0 10px;
+    padding: 10px 16px;
+    font-size: 1em;
+    cursor: pointer;
 }
 </style>
 
+<script src="/assets/js/itil_flashcards_data_detailed.js"></script>
 <script>
-const cards = [
-  { front: "Acceptance criteria", back: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders." },
-  { front: "Agile", back: "A set of frameworks and techniques for collaborative, iterative, and time-boxed development (e.g., Scrum, Lean, Kanban)." },
-  { front: "Availability", back: "The ability of an IT service or other configuration item to perform its agreed function when required." },
-  { front: "Change", back: "The addition, modification, or removal of anything that could have an effect on services." },
-  { front: "Incident", back: "An unplanned interruption to a service or reduction in service quality." },
-  { front: "Service", back: "A means of delivering value to customers by facilitating outcomes they want to achieve without the customer managing specific costs and risks." },
-  // Add more terms...
-];
-
-let currentIndex = 0;
+let currentCardIndex = 0;
 let showingFront = true;
 
-function updateCard() {
-  document.getElementById('card-front').textContent = cards[currentIndex].front;
-  document.getElementById('card-back').textContent = cards[currentIndex].back;
-  document.getElementById('card-front').classList.remove("hidden");
-  document.getElementById('card-back').classList.add("hidden");
-  showingFront = true;
+const front = document.getElementById("card-front");
+const back = document.getElementById("card-back");
+
+function displayCard(index) {
+    front.textContent = flashcards[index].term;
+    back.textContent = flashcards[index].definition;
+    front.classList.remove("hidden");
+    back.classList.add("hidden");
+    showingFront = true;
 }
 
 function flipCard() {
-  showingFront = !showingFront;
-  document.getElementById('card-front').classList.toggle("hidden", !showingFront);
-  document.getElementById('card-back').classList.toggle("hidden", showingFront);
+    if (showingFront) {
+        front.classList.add("hidden");
+        back.classList.remove("hidden");
+    } else {
+        front.classList.remove("hidden");
+        back.classList.add("hidden");
+    }
+    showingFront = !showingFront;
 }
 
 function prevCard() {
-  currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-  updateCard();
+    currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+    displayCard(currentCardIndex);
 }
 
 function nextCard() {
-  currentIndex = (currentIndex + 1) % cards.length;
-  updateCard();
+    currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+    displayCard(currentCardIndex);
 }
 
-document.addEventListener('DOMContentLoaded', updateCard);
+document.addEventListener("DOMContentLoaded", () => {
+    displayCard(currentCardIndex);
+});
 </script>
