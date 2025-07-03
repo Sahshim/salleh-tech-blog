@@ -4,102 +4,92 @@ title: ITIL FlashCard
 permalink: /itil-flashcards/
 ---
 
-<h1>ITIL FlashCards</h1>
+<h1>📚 ITIL FlashCards</h1>
+
 <div id="flashcard-container">
   <div id="flashcard" onclick="flipCard()">
     <div id="card-front" class="card-side"></div>
     <div id="card-back" class="card-side hidden"></div>
   </div>
+
   <div class="controls">
-    <button onclick="prevCard()">Previous</button>
-    <button onclick="flipCard()">Flip</button>
-    <button onclick="nextCard()">Next</button>
+    <button onclick="prevCard()">⏮️ Previous</button>
+    <button onclick="flipCard()">🔁 Flip</button>
+    <button onclick="nextCard()">⏭️ Next</button>
   </div>
 </div>
 
 <style>
-#flashcard-container {
-  text-align: center;
-  margin: 40px auto;
-  max-width: 600px;
-}
-#flashcard {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 40px;
-  min-height: 200px;
-  cursor: pointer;
-  position: relative;
-}
-.card-side {
-  font-size: 20px;
-}
-.hidden {
-  display: none;
-}
-.controls {
-  margin-top: 20px;
-}
-button {
-  margin: 0 10px;
-  padding: 8px 20px;
-  font-size: 16px;
-}
+  #flashcard-container {
+    text-align: center;
+    margin: 40px auto;
+    max-width: 600px;
+  }
+
+  #flashcard {
+    border: 1px solid #ddd;
+    padding: 30px;
+    min-height: 200px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    transition: transform 0.5s ease-in-out;
+    font-size: 1.1rem;
+  }
+
+  .card-side {
+    display: block;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .controls {
+    margin-top: 20px;
+  }
+
+  .controls button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
 </style>
 
+<!-- Load the flashcard data -->
+<script src="{{ '/assets/js/itil_flashcards_data.js' | relative_url }}"></script>
+
 <script>
-const flashcards = [
-  {
-    front: "Acceptance criteria",
-    back: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders."
-  },
-  {
-    front: "Agile",
-    back: "An umbrella term for frameworks and techniques like Scrum, Lean, and Kanban that enable collaboration, prioritization, and timeboxed iterative delivery."
-  },
-  {
-    front: "Architecture management practice",
-    back: "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate."
-  },
-  {
-    front: "Availability",
-    back: "The ability of an IT service or other configuration item to perform its agreed function when required."
-  },
-  {
-    front: "Business case",
-    back: "A justification for expenditure of organizational resources, providing info about costs, benefits, risks, and issues."
-  }
-  // Add more flashcards here!
-];
-
-let currentIndex = 0;
-let flipped = false;
-
-function renderCard() {
+  let currentIndex = 0;
   const front = document.getElementById("card-front");
   const back = document.getElementById("card-back");
-  front.textContent = flashcards[currentIndex].front;
-  back.textContent = flashcards[currentIndex].back;
-  front.classList.remove("hidden");
-  back.classList.add("hidden");
-  flipped = false;
-}
 
-function flipCard() {
-  flipped = !flipped;
-  document.getElementById("card-front").classList.toggle("hidden", flipped);
-  document.getElementById("card-back").classList.toggle("hidden", !flipped);
-}
+  function showCard(index) {
+    const card = flashcards[index];
+    front.innerHTML = `<strong>${card.front}</strong>`;
+    back.innerHTML = card.back;
+    front.classList.remove("hidden");
+    back.classList.add("hidden");
+  }
 
-function nextCard() {
-  currentIndex = (currentIndex + 1) % flashcards.length;
-  renderCard();
-}
+  function flipCard() {
+    front.classList.toggle("hidden");
+    back.classList.toggle("hidden");
+  }
 
-function prevCard() {
-  currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
-  renderCard();
-}
+  function nextCard() {
+    currentIndex = (currentIndex + 1) % flashcards.length;
+    showCard(currentIndex);
+  }
 
-document.addEventListener("DOMContentLoaded", renderCard);
+  function prevCard() {
+    currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+    showCard(currentIndex);
+  }
+
+  // Show first card
+  document.addEventListener("DOMContentLoaded", () => {
+    showCard(currentIndex);
+  });
 </script>
