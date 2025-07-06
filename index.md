@@ -7,7 +7,7 @@ title: Welcome to Salleh Cloud Labs
   <h1>Welcome to Salleh Cloud Labs</h1>
 
   <p>
-    Explore my blog posts, ITIL flashcards, resume, and more using the navigation menu above.
+    Explore my blog posts, resume, and more using the navigation menu above.
   </p>
 
   
