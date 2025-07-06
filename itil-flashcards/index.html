@@ -5,6 +5,12 @@ permalink: /itil-flashcards/
 
 <h1>🧠 ITIL FlashCards</h1>
 
+<input type="text" id="searchInput" placeholder="Search term or definition..." oninput="searchFlashcards()" />
+<button onclick="shuffleCards()">🃏 Shuffle</button>
+<select id="categoryFilter" onchange="filterByCategory()">
+  <option value="all">All Categories</option>
+</select>
+
 <div id="flashcard-container">
   <div id="flashcard" onclick="flipCard()">
     <div id="card-front" class="card-side"></div>
@@ -52,16 +58,23 @@ permalink: /itil-flashcards/
     padding: 10px 16px;
     font-size: 1em;
   }
+
+  #searchInput {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 60%;
+    font-size: 1em;
+  }
 </style>
 
-<!-- Load flashcard data -->
 <script src="/assets/js/itil_flashcards_data.js"></script>
 <script>
   let currentCardIndex = 0;
   let showingFront = true;
+  let filteredFlashcards = [...flashcards];
 
   function renderCard() {
-    const card = flashcards[currentCardIndex];
+    const card = filteredFlashcards[currentCardIndex];
     const cardFront = document.getElementById("card-front");
     const cardBack = document.getElementById("card-back");
 
@@ -82,17 +95,62 @@ permalink: /itil-flashcards/
   }
 
   function nextCard() {
-    currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+    currentCardIndex = (currentCardIndex + 1) % filteredFlashcards.length;
     if (!showingFront) flipCard();
     renderCard();
   }
 
   function prevCard() {
-    currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+    currentCardIndex = (currentCardIndex - 1 + filteredFlashcards.length) % filteredFlashcards.length;
     if (!showingFront) flipCard();
     renderCard();
   }
 
-  // Show first card on load
+  function shuffleCards() {
+    for (let i = filteredFlashcards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filteredFlashcards[i], filteredFlashcards[j]] = [filteredFlashcards[j], filteredFlashcards[i]];
+    }
+    currentCardIndex = 0;
+    renderCard();
+  }
+
+  function searchFlashcards() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    filteredFlashcards = flashcards.filter(card =>
+      card.term.toLowerCase().includes(query) ||
+      card.definition.toLowerCase().includes(query)
+    );
+    currentCardIndex = 0;
+    renderCard();
+  }
+
+  function filterByCategory() {
+    const category = document.getElementById("categoryFilter").value;
+    if (category === "all") {
+      filteredFlashcards = [...flashcards];
+    } else {
+      filteredFlashcards = flashcards.filter(card => card.term.toLowerCase().includes(category));
+    }
+    currentCardIndex = 0;
+    renderCard();
+  }
+
+  function populateCategories() {
+    const filter = document.getElementById("categoryFilter");
+    const keywords = new Set();
+    flashcards.forEach(card => {
+      const word = card.term.split(" ")[0].toLowerCase();
+      if (word.length > 3) keywords.add(word);
+    });
+    [...keywords].sort().forEach(keyword => {
+      const opt = document.createElement("option");
+      opt.value = keyword;
+      opt.textContent = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+      filter.appendChild(opt);
+    });
+  }
+
+  populateCategories();
   renderCard();
 </script>
