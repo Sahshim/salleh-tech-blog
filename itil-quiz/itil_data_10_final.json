@@ -1,0 +1,52 @@
+[
+  {
+    "term": "Acceptance criteria",
+    "definition": "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
+    "icon": "Acceptance criteria.png"
+  },
+  {
+    "term": "Agile",
+    "definition": "An umbrella term for a collection of frameworks and techniques that enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing.",
+    "icon": "Agile.png"
+  },
+  {
+    "term": "Architecture management practice",
+    "definition": "The practice of providing an understanding of all the different elements that make up an organization and how those elements interrelate.",
+    "icon": "Architecture management practice.png"
+  },
+  {
+    "term": "Asset register",
+    "definition": "A database or list of assets, capturing key attributes such as ownership and financial value.",
+    "icon": "Asset register.png"
+  },
+  {
+    "term": "Availability",
+    "definition": "The ability of an IT service or other configuration item to perform its agreed function when required.",
+    "icon": "Availability.png"
+  },
+  {
+    "term": "Availability management practice",
+    "definition": "The practice of ensuring that services deliver agreed levels of availability to meet the needs of customers and users.",
+    "icon": "Availability management practice.png"
+  },
+  {
+    "term": "Baseline",
+    "definition": "A report or metric that serves as a starting point against which progress or change can be assessed.",
+    "icon": "Baseline.png"
+  },
+  {
+    "term": "Best practice",
+    "definition": "A way of working that has been proven to be successful by multiple organizations.",
+    "icon": "Best practice.png"
+  },
+  {
+    "term": "Big data",
+    "definition": "The use of very large volumes of structured and unstructured data from a variety of sources to gain new insights.",
+    "icon": "Big data.png"
+  },
+  {
+    "term": "Business analysis practice",
+    "definition": "The practice of analyzing a business or some element of a business, defining its needs and recommending solutions to address these needs and/or solve a business problem.",
+    "icon": "Business analysis practice.png"
+  }
+]
