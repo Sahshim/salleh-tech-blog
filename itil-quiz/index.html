@@ -6,7 +6,7 @@
   <title>ITIL Adaptive Quiz</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
-    .quiz-container { max-width: 600px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .quiz-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .question-image { text-align: center; margin-bottom: 1rem; }
     .question-image img { max-width: 150px; }
     h2 { font-size: 1.2rem; }
@@ -31,24 +31,19 @@
 
   <script>
     let allData = [
-      { term: "Acceptance criteria", definition: "A list of minimum requirements...", icon: "https://cdn-icons-png.flaticon.com/512/2529/2529521.png" },
-      { term: "Agile", definition: "An umbrella term for...", icon: "https://cdn-icons-png.flaticon.com/512/1865/1865269.png" },
-      { term: "Architecture management practice", definition: "The practice of providing...", icon: "https://cdn-icons-png.flaticon.com/512/4359/4359935.png" },
-      { term: "Asset register", definition: "A database or list of assets...", icon: "https://cdn-icons-png.flaticon.com/512/2920/2920244.png" },
-      { term: "Availability", definition: "The ability of an IT service...", icon: "https://cdn-icons-png.flaticon.com/512/983/983615.png" }
-      // Add all 217 entries with term, definition, icon
+      { term: "Acceptance criteria", definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.", icon: "https://cdn-icons-png.flaticon.com/512/2529/2529521.png" },
+      { term: "Agile", definition: "An umbrella term for a collection of frameworks and techniques that together enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing.", icon: "https://cdn-icons-png.flaticon.com/512/1865/1865269.png" },
+      { term: "Architecture management practice", definition: "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate to one another.", icon: "https://cdn-icons-png.flaticon.com/512/4359/4359935.png" },
+      { term: "Asset register", definition: "A database or list of assets, capturing key attributes such as ownership and financial value.", icon: "https://cdn-icons-png.flaticon.com/512/2920/2920244.png" },
+      { term: "Availability", definition: "The ability of an IT service or other configuration item to perform its agreed function when required.", icon: "https://cdn-icons-png.flaticon.com/512/983/983615.png" }
+      // TODO: Add all 217 entries with term, full definition, and icon
     ];
 
-    // Limit to 40 random questions
-    const shuffled = allData.sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 40);
+    // Select 40 random questions from full dataset
+    const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 40);
 
     const quizData = selected.map(item => {
-      const distractors = allData
-        .filter(d => d.term !== item.term)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3)
-        .map(d => d.term);
+      const distractors = allData.filter(d => d.term !== item.term).sort(() => 0.5 - Math.random()).slice(0, 3).map(d => d.term);
       return {
         question: item.definition,
         correct_answer: item.term,
@@ -66,9 +61,9 @@
 
     function loadQuestion() {
       const q = quizData[current];
-      questionEl.innerText = `Q${current + 1}: ${q.question}`;
-      optionsEl.innerHTML = '';
+      questionEl.innerHTML = `<strong>Definition:</strong> ${q.question}`;
       iconEl.src = q.icon;
+      optionsEl.innerHTML = '';
       q.options.forEach(option => {
         const btn = document.createElement('button');
         btn.innerText = option;
@@ -94,8 +89,10 @@
         alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${timer}s`);
         current = 0; score = 0; timer = 0;
         startTimer();
+        loadQuestion();
+      } else {
+        loadQuestion();
       }
-      loadQuestion();
     }
 
     function startTimer() {
@@ -105,7 +102,7 @@
       }, 1000);
     }
 
-    // Initial render
+    // Initial load
     loadQuestion();
     startTimer();
   </script>
