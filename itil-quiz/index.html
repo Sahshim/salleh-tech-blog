@@ -30,35 +30,37 @@
   </div>
 
   <script>
-    let allData = [
-      { term: "Acceptance criteria", definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.", icon: "https://cdn-icons-png.flaticon.com/512/2529/2529521.png" },
-      { term: "Agile", definition: "An umbrella term for a collection of frameworks and techniques that together enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing.", icon: "https://cdn-icons-png.flaticon.com/512/1865/1865269.png" },
-      { term: "Architecture management practice", definition: "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate to one another.", icon: "https://cdn-icons-png.flaticon.com/512/4359/4359935.png" },
-      { term: "Asset register", definition: "A database or list of assets, capturing key attributes such as ownership and financial value.", icon: "https://cdn-icons-png.flaticon.com/512/2920/2920244.png" },
-      { term: "Availability", definition: "The ability of an IT service or other configuration item to perform its agreed function when required.", icon: "https://cdn-icons-png.flaticon.com/512/983/983615.png" }
-      // TODO: Add all 217 entries with term, full definition, and icon
-    ];
+  fetch('itil_data.json')
+    .then(response => response.json())
+    .then(allData => {
+      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 40);
 
-    // Select 40 random questions from full dataset
-    const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 40);
+      const quizData = selected.map(item => {
+        const distractors = allData
+          .filter(d => d.term !== item.term)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+          .map(d => d.term);
 
-    const quizData = selected.map(item => {
-      const distractors = allData.filter(d => d.term !== item.term).sort(() => 0.5 - Math.random()).slice(0, 3).map(d => d.term);
-      return {
-        question: item.definition,
-        correct_answer: item.term,
-        icon: item.icon,
-        options: [...distractors, item.term].sort(() => 0.5 - Math.random())
-      };
+        return {
+          question: item.definition,
+          correct_answer: item.term,
+          icon: item.icon,
+          options: [...distractors, item.term].sort(() => 0.5 - Math.random())
+        };
+      });
+
+      initQuiz(quizData);
     });
 
-    let current = 0, score = 0, timer = 0, timerInterval;
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
-    const scoreEl = document.getElementById('score');
-    const timerEl = document.getElementById('timer');
-    const iconEl = document.getElementById('icon');
+  let current = 0, score = 0, timer = 0, timerInterval;
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const scoreEl = document.getElementById('score');
+  const timerEl = document.getElementById('timer');
+  const iconEl = document.getElementById('icon');
 
+  function initQuiz(quizData) {
     function loadQuestion() {
       const q = quizData[current];
       questionEl.innerHTML = `<strong>Definition:</strong> ${q.question}`;
@@ -102,9 +104,10 @@
       }, 1000);
     }
 
-    // Initial load
+    window.nextQuestion = nextQuestion;
     loadQuestion();
     startTimer();
-  </script>
+  }
+</script>
 </body>
 </html>
