@@ -29,7 +29,59 @@
   </div>
 
   <script>
-    const quizData = REPLACE_ME_WITH_JSON;
+    const quizData = [
+  {
+    "question": "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders. 2",
+    "correct_answer": "Acceptance criteria",
+    "options": [
+      "Request catalogue",
+      "Acceptance criteria",
+      "Supplier",
+      "Practice"
+    ]
+  },
+  {
+    "question": "An umbrella term for a collection of frameworks and techniques that together enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing. There are several specific methods (or frameworks) that are classed as Agile, such as Scrum, Lean, and Kanban. 3",
+    "correct_answer": "Agile",
+    "options": [
+      "Cost centre",
+      "Agile",
+      "Information security policy",
+      "Configuration management system (CMS)"
+    ]
+  },
+  {
+    "question": "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate to one another. 4",
+    "correct_answer": "Architecture management practice",
+    "options": [
+      "Architecture management practice",
+      "Warranty",
+      "Workaround",
+      "Problem"
+    ]
+  },
+  {
+    "question": "A database or list of assets, capturing key attributes such as ownership and financial value. 5",
+    "correct_answer": "Asset register",
+    "options": [
+      "Asset register",
+      "Change",
+      "Release",
+      "Outcome"
+    ]
+  },
+  {
+    "question": "The ability of an IT service or other configuration item to perform its agreed function when required. 6",
+    "correct_answer": "Availability",
+    "options": [
+      "Change schedule",
+      "Availability",
+      "Service level",
+      "Risk"
+    ]
+  }
+];
+
     let current = 0, score = 0;
     const questionEl = document.getElementById('question');
     const optionsEl = document.getElementById('options');
