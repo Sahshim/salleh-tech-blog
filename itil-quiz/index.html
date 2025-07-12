@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITIL Adaptive Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+    .quiz-container { max-width: 600px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .question-image { text-align: center; margin-bottom: 1rem; }
+    .question-image img { max-width: 150px; }
+    h2 { font-size: 1.2rem; }
+    .options { margin-top: 1rem; }
+    .options button { display: block; margin: 0.5rem 0; width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9; cursor: pointer; transition: background 0.3s; }
+    .options button:hover { background: #e0e0e0; }
+    .score { margin-top: 1.5rem; font-weight: bold; }
+    .next { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="question-image">
+      <img src="https://cdn-icons-png.flaticon.com/512/3105/3105890.png" alt="concept" id="icon" />
+    </div>
+    <h2 id="question">Loading...</h2>
+    <div class="options" id="options"></div>
+    <div class="score" id="score"></div>
+    <button class="next" onclick="nextQuestion()">Next Question</button>
+  </div>
+
+  <script>
+    const quizData = REPLACE_ME_WITH_JSON;
+    let current = 0, score = 0;
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const scoreEl = document.getElementById('score');
+
+    function loadQuestion() {
+      const q = quizData[current];
+      questionEl.innerText = `Q${current + 1}: ${q.question}`;
+      optionsEl.innerHTML = '';
+      q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.innerText = option;
+        btn.onclick = () => checkAnswer(option, q.correct_answer);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        score++;
+        alert('✅ Correct!');
+      } else {
+        alert(`❌ Wrong! Correct answer: ${correct}`);
+      }
+      scoreEl.innerText = `Score: ${score} / ${current + 1}`;
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= quizData.length) {
+        alert(`Quiz complete! Your score: ${score}/${quizData.length}`);
+        current = 0; score = 0;
+      }
+      loadQuestion();
+    }
+
+    // Initial render
+    loadQuestion();
+  </script>
+</body>
+</html>
