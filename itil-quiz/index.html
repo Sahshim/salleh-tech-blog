@@ -20,20 +20,20 @@
 <body>
   <div class="quiz-container">
     <div class="question-image">
-      <img src="https://cdn-icons-png.flaticon.com/512/3105/3105890.png" alt="concept" id="icon" />
+      <img src="" alt="concept" id="icon" />
     </div>
     <h2 id="question">Loading...</h2>
     <div class="options" id="options"></div>
     <div class="score" id="score"></div>
-    <div class="timer" id="timer">Time: 0s</div>
+    <div class="timer" id="timer">Time: 00:00</div>
     <button class="next" onclick="nextQuestion()">Next Question</button>
   </div>
 
   <script>
-  fetch('itil_data.json')
+  fetch('itil_data_10.json')
     .then(response => response.json())
     .then(allData => {
-      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 40);
+      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
 
       const quizData = selected.map(item => {
         const distractors = allData
@@ -53,12 +53,18 @@
       initQuiz(quizData);
     });
 
-  let current = 0, score = 0, timer = 0, timerInterval;
+  let current = 0, score = 0, seconds = 0, timerInterval;
   const questionEl = document.getElementById('question');
   const optionsEl = document.getElementById('options');
   const scoreEl = document.getElementById('score');
   const timerEl = document.getElementById('timer');
   const iconEl = document.getElementById('icon');
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
 
   function initQuiz(quizData) {
     function loadQuestion() {
@@ -88,8 +94,8 @@
       current++;
       if (current >= quizData.length) {
         clearInterval(timerInterval);
-        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${timer}s`);
-        current = 0; score = 0; timer = 0;
+        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
+        current = 0; score = 0; seconds = 0;
         startTimer();
         loadQuestion();
       } else {
@@ -98,9 +104,14 @@
     }
 
     function startTimer() {
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        timer++;
-        timerEl.innerText = `Time: ${timer}s`;
+        seconds++;
+        timerEl.innerText = `Time: ${formatTime(seconds)}`;
+        if (seconds >= 3600) {
+          clearInterval(timerInterval);
+          alert(`⏰ Time's up! Final score: ${score}/${quizData.length}`);
+        }
       }, 1000);
     }
 
