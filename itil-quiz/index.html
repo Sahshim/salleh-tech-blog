@@ -15,6 +15,8 @@
     .options button:hover { background: #e0e0e0; }
     .score, .timer { margin-top: 1.5rem; font-weight: bold; }
     .next { margin-top: 1rem; }
+    .chart-container { margin-top: 2rem; }
+    canvas { width: 100% !important; height: auto !important; }
   </style>
 </head>
 <body>
@@ -27,19 +29,15 @@
     <div class="score" id="score"></div>
     <div class="timer" id="timer">Time: 00:00</div>
     <button class="next" onclick="nextQuestion()">Next Question</button>
+    <div class="chart-container">
+      <canvas id="progressChart"></canvas>
+    </div>
   </div>
 
-<script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
   const currentUser = "Salleh";
-  let userProgress = [];
-
-  // Load previous progress
-  const stored = localStorage.getItem(`progress_${currentUser}`);
-  if (stored) {
-    userProgress = JSON.parse(stored);
-    console.log(`📊 Loaded previous progress for ${currentUser}:`, userProgress);
-    alert(`Welcome back, ${currentUser}! You have ${userProgress.length} logged answers.`);
-  }
+  const userProgress = [];
 
   fetch('itil_data_10_final.json')
     .then(response => response.json())
@@ -112,6 +110,41 @@
       scoreEl.innerText = `Score: ${score} / ${current + 1}`;
     }
 
+    function drawChart() {
+      const counts = {};
+      userProgress.forEach(entry => {
+        if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0 };
+        if (entry.correct) counts[entry.term].correct++;
+        else counts[entry.term].incorrect++;
+      });
+      const labels = Object.keys(counts);
+      const correctData = labels.map(label => counts[label].correct);
+      const incorrectData = labels.map(label => counts[label].incorrect);
+
+      new Chart(document.getElementById('progressChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Correct',
+              data: correctData,
+              backgroundColor: 'rgba(75, 192, 192, 0.7)'
+            },
+            {
+              label: 'Incorrect',
+              data: incorrectData,
+              backgroundColor: 'rgba(255, 99, 132, 0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' }, title: { display: true, text: 'Your Progress by Term' } }
+        }
+      });
+    }
+
     function nextQuestion() {
       current++;
       if (current >= quizData.length) {
@@ -119,6 +152,7 @@
         alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
         console.table(userProgress);
         localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
+        drawChart();
         current = 0; score = 0; seconds = 0;
         userProgress.length = 0;
         startTimer();
@@ -145,6 +179,5 @@
     startTimer();
   }
 </script>
-
 </body>
 </html>
