@@ -16,7 +16,11 @@
     .score, .timer { margin-top: 1.5rem; font-weight: bold; }
     .next { margin-top: 1rem; }
     .chart-container { margin-top: 2rem; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 1rem; font-size: 0.9rem; }
     canvas { width: 100% !important; height: auto !important; }
+    .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+    .accordion-item.active { background: #e6f7ff; }
+    .accordion-content { display: none; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
@@ -31,13 +35,18 @@
     <button class="next" onclick="nextQuestion()">Next Question</button>
     <div class="chart-container">
       <canvas id="progressChart"></canvas>
+      <div class="pagination" id="chartPagination"></div>
+      <div class="filters">
+        <label><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
+      </div>
+      <div id="accordion"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
   const currentUser = "Salleh";
-  const userProgress = [];
+  const userProgress = JSON.parse(localStorage.getItem(`progress_${currentUser}`)) || [];
 
   fetch('itil_data_10_final.json')
     .then(response => response.json())
@@ -110,21 +119,27 @@
       scoreEl.innerText = `Score: ${score} / ${current + 1}`;
     }
 
-    function drawChart() {
+    function drawChart(page = 0, pageSize = 10) {
       const counts = {};
       userProgress.forEach(entry => {
-        if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0 };
+        if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0, definition: entry.question };
         if (entry.correct) counts[entry.term].correct++;
         else counts[entry.term].incorrect++;
       });
-      const labels = Object.keys(counts);
-      const correctData = labels.map(label => counts[label].correct);
-      const incorrectData = labels.map(label => counts[label].incorrect);
+      let allLabels = Object.keys(counts);
+      if (document.getElementById('filterIncorrect').checked) {
+        allLabels = allLabels.filter(label => counts[label].incorrect > 0);
+      }
+      const pageLabels = allLabels.slice(page * pageSize, (page + 1) * pageSize);
+      const correctData = pageLabels.map(label => counts[label].correct);
+      const incorrectData = pageLabels.map(label => counts[label].incorrect);
 
-      new Chart(document.getElementById('progressChart'), {
+      const ctx = document.getElementById('progressChart');
+      if (window.chartInstance) window.chartInstance.destroy();
+      window.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels,
+          labels: pageLabels,
           datasets: [
             {
               label: 'Correct',
@@ -143,6 +158,27 @@
           plugins: { legend: { position: 'top' }, title: { display: true, text: 'Your Progress by Term' } }
         }
       });
+
+      const pagination = document.getElementById('chartPagination');
+      pagination.innerHTML = `
+        <button onclick="drawChart(${page - 1})" ${page <= 0 ? 'disabled' : ''}>⬅ Prev Page</button>
+        Showing terms ${page * pageSize + 1}–${Math.min((page + 1) * pageSize, allLabels.length)} of ${allLabels.length}
+        <button onclick="drawChart(${page + 1})" ${(page + 1) * pageSize >= allLabels.length ? 'disabled' : ''}>Next Page ➡</button>
+      `;
+
+      const accordion = document.getElementById('accordion');
+      accordion.innerHTML = '';
+      pageLabels.forEach(label => {
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+        item.innerHTML = `<strong>${label}</strong>`;
+        const content = document.createElement('div');
+        content.className = 'accordion-content';
+        content.innerText = counts[label].definition;
+        item.appendChild(content);
+        item.onclick = () => content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        accordion.appendChild(item);
+      });
     }
 
     function nextQuestion() {
@@ -150,7 +186,6 @@
       if (current >= quizData.length) {
         clearInterval(timerInterval);
         alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
-        console.table(userProgress);
         localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
         drawChart();
         current = 0; score = 0; seconds = 0;
@@ -175,9 +210,10 @@
     }
 
     window.nextQuestion = nextQuestion;
+    window.drawChart = drawChart;
     loadQuestion();
     startTimer();
   }
-</script>
+  </script>
 </body>
 </html>
