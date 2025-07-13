@@ -13,6 +13,7 @@
     .options { margin-top: 1rem; }
     .options button { display: block; margin: 0.5rem 0; width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9; cursor: pointer; transition: background 0.3s; }
     .options button:hover { background: #e0e0e0; }
+    .options button.disabled { pointer-events: none; opacity: 0.6; }
     .score, .timer { margin-top: 1.5rem; font-weight: bold; }
     .next { margin-top: 1rem; }
     .chart-container { margin-top: 2rem; }
@@ -93,7 +94,12 @@
       q.options.forEach(option => {
         const btn = document.createElement('button');
         btn.innerText = option;
-        btn.onclick = () => checkAnswer(option, q.correct_answer, q.question);
+        btn.onclick = () => {
+          if (!btn.classList.contains('disabled')) {
+            Array.from(optionsEl.children).forEach(b => b.classList.add('disabled'));
+            checkAnswer(option, q.correct_answer, q.question);
+          }
+        };
         optionsEl.appendChild(btn);
       });
     }
@@ -141,16 +147,8 @@
         data: {
           labels: pageLabels,
           datasets: [
-            {
-              label: 'Correct',
-              data: correctData,
-              backgroundColor: 'rgba(75, 192, 192, 0.7)'
-            },
-            {
-              label: 'Incorrect',
-              data: incorrectData,
-              backgroundColor: 'rgba(255, 99, 132, 0.7)'
-            }
+            { label: 'Correct', data: correctData, backgroundColor: 'rgba(75, 192, 192, 0.7)' },
+            { label: 'Incorrect', data: incorrectData, backgroundColor: 'rgba(255, 99, 132, 0.7)' }
           ]
         },
         options: {
