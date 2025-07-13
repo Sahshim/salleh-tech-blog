@@ -22,20 +22,22 @@
     .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
     .accordion-item.active { background: #e6f7ff; }
     .accordion-content { display: none; margin-top: 0.5rem; }
-    .user-controls { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; }
+    .user-controls { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .admin-only { display: none; }
+    .admin-visible .admin-only { display: inline-block !important; }
   </style>
 </head>
 <body>
   <div class="quiz-container">
-    <div class="user-controls">
+    <div class="user-controls" id="userControls">
       <label for="userSelector">Choose user:</label>
       <select id="userSelector" onchange="switchUser(this.value)"></select>
-      <button onclick="promptPasswordAndAddUser()">+ Add User</button>
-      <button onclick="forgotPassword()">🔑 Forgot Password</button>
-      <button onclick="resetProgress()">🔄 Reset Progress</button>
-      <button onclick="exportProgress()">⬇ Export</button>
+      <button onclick="promptPasswordAndAddUser()" class="admin-only">+ Add User</button>
+      <button onclick="forgotPassword()" class="admin-only">🔑 Forgot Password</button>
+      <button onclick="resetProgress()" class="admin-only">🔄 Reset Progress</button>
+      <button onclick="exportProgress()" class="admin-only">⬇ Export</button>
       <input type="file" id="importFile" style="display:none" onchange="importProgress(event)">
-      <button onclick="document.getElementById('importFile').click()">⬆ Import</button>
+      <button onclick="document.getElementById('importFile').click()" class="admin-only">⬆ Import</button>
     </div>
 
     <div class="question-image">
@@ -58,93 +60,103 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-  let inactivityTimer;
+    let inactivityTimer;
 
-  function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      alert("Session expired due to inactivity.");
-      localStorage.removeItem('current_user');
-      location.reload();
-    }, 10 * 60 * 1000); // 10 minutes
-  }
-
-  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
-    document.addEventListener(evt, resetInactivityTimer));
-
-  resetInactivityTimer();
-
-  function promptPasswordAndAddUser() {
-    const newUser = prompt("Enter new user name:");
-    if (!newUser || !newUser.trim()) return;
-    const newPassword = prompt("Set a password for " + newUser + ":");
-    if (!newPassword) return;
-    localStorage.setItem(`user_password_${newUser}`, btoa(newPassword));
-    localStorage.setItem(`progress_${newUser}`, JSON.stringify([]));
-    saveUserList(newUser);
-    localStorage.setItem('current_user', newUser);
-    location.reload();
-  }
-
-  function forgotPassword() {
-    const user = prompt("Enter your username:");
-    if (!user || !localStorage.getItem(`user_password_${user}`)) {
-      alert("User not found.");
-      return;
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        alert("Session expired due to inactivity.");
+        localStorage.removeItem('current_user');
+        location.reload();
+      }, 10 * 60 * 1000);
     }
-    if (confirm(`Do you want to reset the password for ${user}? This will erase your existing progress.`)) {
-      localStorage.removeItem(`user_password_${user}`);
-      localStorage.removeItem(`progress_${user}`);
-      alert("Password and progress reset. You can now add the user again.");
+
+    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
+      document.addEventListener(evt, resetInactivityTimer));
+    resetInactivityTimer();
+
+    function promptPasswordAndAddUser() {
+      const newUser = prompt("Enter new user name:");
+      if (!newUser || !newUser.trim()) return;
+      const newPassword = prompt("Set a password for " + newUser + ":");
+      if (!newPassword) return;
+      localStorage.setItem(`user_password_${newUser}`, btoa(newPassword));
+      localStorage.setItem(`progress_${newUser}`, JSON.stringify([]));
+      saveUserList(newUser);
+      localStorage.setItem('current_user', newUser);
       location.reload();
     }
-  }
 
-  function switchUser(user) {
-    const storedPassword = localStorage.getItem(`user_password_${user}`);
-    const input = prompt("Enter password for " + user + ":");
-    if (!input || btoa(input) !== storedPassword) {
-      alert("Incorrect password.");
-      document.getElementById('userSelector').value = localStorage.getItem('current_user');
-      return;
+    function forgotPassword() {
+      const user = prompt("Enter your username:");
+      if (!user || !localStorage.getItem(`user_password_${user}`)) {
+        alert("User not found.");
+        return;
+      }
+      if (confirm(`Do you want to reset the password for ${user}? This will erase your existing progress.`)) {
+        localStorage.removeItem(`user_password_${user}`);
+        localStorage.removeItem(`progress_${user}`);
+        alert("Password and progress reset. You can now add the user again.");
+        location.reload();
+      }
     }
-    localStorage.setItem('current_user', user);
-    location.reload();
-  }
 
-  function resetProgress() {
-    if (confirm(`Reset progress for ${currentUser}?`)) {
-      localStorage.removeItem(`progress_${currentUser}`);
+    function switchUser(user) {
+      const storedPassword = localStorage.getItem(`user_password_${user}`);
+      const input = prompt("Enter password for " + user + ":");
+      if (!input || btoa(input) !== storedPassword) {
+        alert("Incorrect password.");
+        document.getElementById('userSelector').value = localStorage.getItem('current_user');
+        return;
+      }
+      localStorage.setItem('current_user', user);
       location.reload();
     }
-  }
 
-  function exportProgress() {
-    const data = localStorage.getItem(`progress_${currentUser}`);
-    const blob = new Blob([data], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${currentUser}_progress.json`;
-    a.click();
-  }
-
-  function importProgress(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const data = JSON.parse(e.target.result);
-          localStorage.setItem(`progress_${currentUser}`, JSON.stringify(data));
-          alert("Progress imported!");
-          location.reload();
-        } catch {
-          alert("Invalid file format");
-        }
-      };
-      reader.readAsText(file);
+    function resetProgress() {
+      if (confirm(`Reset progress for ${currentUser}?`)) {
+        localStorage.removeItem(`progress_${currentUser}`);
+        location.reload();
+      }
     }
-  }
+
+    function exportProgress() {
+      const data = localStorage.getItem(`progress_${currentUser}`);
+      const blob = new Blob([data], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${currentUser}_progress.json`;
+      a.click();
+    }
+
+    function importProgress(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            const data = JSON.parse(e.target.result);
+            localStorage.setItem(`progress_${currentUser}`, JSON.stringify(data));
+            alert("Progress imported!");
+            location.reload();
+          } catch {
+            alert("Invalid file format");
+          }
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    // User setup
+    const userSelector = document.getElementById('userSelector');
+    const userControls = document.getElementById('userControls');
+    const users = [...Object.keys(localStorage)].filter(k => k.startsWith('user_password_')).map(k => k.replace('user_password_', ''));
+    userSelector.innerHTML = users.map(u => `<option value="${u}">${u}</option>`).join('');
+    const currentUser = localStorage.getItem('current_user');
+    if (currentUser) {
+      userSelector.value = currentUser;
+      if (currentUser === 'Salleh') userControls.classList.add('admin-visible');
+    }
   </script>
 </body>
 </html>
