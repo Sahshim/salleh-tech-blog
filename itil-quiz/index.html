@@ -45,7 +45,7 @@
         return {
           question: item.definition,
           correct_answer: item.term,
-          icon: `/assets/images/${encodeURIComponent(item.icon)}`,
+          icon: `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}`,
           options: [...distractors, item.term].sort(() => 0.5 - Math.random())
         };
       });
