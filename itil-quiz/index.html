@@ -29,7 +29,18 @@
     <button class="next" onclick="nextQuestion()">Next Question</button>
   </div>
 
-  <script>
+<script>
+  const currentUser = "Salleh";
+  let userProgress = [];
+
+  // Load previous progress
+  const stored = localStorage.getItem(`progress_${currentUser}`);
+  if (stored) {
+    userProgress = JSON.parse(stored);
+    console.log(`📊 Loaded previous progress for ${currentUser}:`, userProgress);
+    alert(`Welcome back, ${currentUser}! You have ${userProgress.length} logged answers.`);
+  }
+
   fetch('itil_data_10_final.json')
     .then(response => response.json())
     .then(allData => {
@@ -75,18 +86,29 @@
       q.options.forEach(option => {
         const btn = document.createElement('button');
         btn.innerText = option;
-        btn.onclick = () => checkAnswer(option, q.correct_answer);
+        btn.onclick = () => checkAnswer(option, q.correct_answer, q.question);
         optionsEl.appendChild(btn);
       });
     }
 
-    function checkAnswer(selected, correct) {
-      if (selected === correct) {
+    function checkAnswer(selected, correct, questionText) {
+      const isCorrect = selected === correct;
+      if (isCorrect) {
         score++;
         alert('✅ Correct!');
       } else {
         alert(`❌ Wrong! Correct answer: ${correct}`);
       }
+
+      userProgress.push({
+        user: currentUser,
+        question: questionText,
+        term: correct,
+        selected: selected,
+        correct: isCorrect,
+        timestamp: new Date().toISOString()
+      });
+
       scoreEl.innerText = `Score: ${score} / ${current + 1}`;
     }
 
@@ -95,7 +117,10 @@
       if (current >= quizData.length) {
         clearInterval(timerInterval);
         alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
+        console.table(userProgress);
+        localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
         current = 0; score = 0; seconds = 0;
+        userProgress.length = 0;
         startTimer();
         loadQuestion();
       } else {
@@ -120,5 +145,6 @@
     startTimer();
   }
 </script>
+
 </body>
 </html>
