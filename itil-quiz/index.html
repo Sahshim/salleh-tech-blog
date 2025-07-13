@@ -30,7 +30,7 @@
   </div>
 
   <script>
-  fetch('itil_data_10.json')
+  fetch('itil_data_10_final.json')
     .then(response => response.json())
     .then(allData => {
       const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
