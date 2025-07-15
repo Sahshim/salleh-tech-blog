@@ -13,33 +13,12 @@
     .options { margin-top: 1rem; }
     .options button { display: block; margin: 0.5rem 0; width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9; cursor: pointer; transition: background 0.3s; }
     .options button:hover { background: #e0e0e0; }
-    .options button.disabled { pointer-events: none; opacity: 0.6; }
     .score, .timer { margin-top: 1.5rem; font-weight: bold; }
     .next { margin-top: 1rem; }
-    .chart-container { margin-top: 2rem; }
-    .pagination { display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 1rem; font-size: 0.9rem; }
-    canvas { width: 100% !important; height: auto !important; }
-    .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-    .accordion-item.active { background: #e6f7ff; }
-    .accordion-content { display: none; margin-top: 0.5rem; }
-    .user-controls { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-    .admin-only { display: none; }
-    .admin-visible .admin-only { display: inline-block !important; }
   </style>
 </head>
 <body>
   <div class="quiz-container">
-    <div class="user-controls" id="userControls">
-      <label for="userSelector">Choose user:</label>
-      <select id="userSelector" onchange="switchUser(this.value)"></select>
-      <button onclick="promptPasswordAndAddUser()" class="admin-only">+ Add User</button>
-      <button onclick="forgotPassword()" class="admin-only">🔑 Forgot Password</button>
-      <button onclick="resetProgress()" class="admin-only">🔄 Reset Progress</button>
-      <button onclick="exportProgress()" class="admin-only">⬇ Export</button>
-      <input type="file" id="importFile" style="display:none" onchange="importProgress(event)">
-      <button onclick="document.getElementById('importFile').click()" class="admin-only">⬆ Import</button>
-    </div>
-
     <div class="question-image">
       <img src="" alt="concept" id="icon" />
     </div>
@@ -48,115 +27,124 @@
     <div class="score" id="score"></div>
     <div class="timer" id="timer">Time: 00:00</div>
     <button class="next" onclick="nextQuestion()">Next Question</button>
-    <div class="chart-container">
-      <canvas id="progressChart"></canvas>
-      <div class="pagination" id="chartPagination"></div>
-      <div class="filters">
-        <label><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-      </div>
-      <div id="accordion"></div>
-    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    let inactivityTimer;
+<script>
+  const currentUser = "Salleh";
+  let userProgress = [];
 
-    function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        alert("Session expired due to inactivity.");
-        localStorage.removeItem('current_user');
-        location.reload();
-      }, 10 * 60 * 1000);
-    }
+  // Load previous progress
+  const stored = localStorage.getItem(`progress_${currentUser}`);
+  if (stored) {
+    userProgress = JSON.parse(stored);
+    console.log(`📊 Loaded previous progress for ${currentUser}:`, userProgress);
+    alert(`Welcome back, ${currentUser}! You have ${userProgress.length} logged answers.`);
+  }
 
-    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
-      document.addEventListener(evt, resetInactivityTimer));
-    resetInactivityTimer();
+  fetch('itil_data_10_final.json')
+    .then(response => response.json())
+    .then(allData => {
+      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
 
-    function promptPasswordAndAddUser() {
-      const newUser = prompt("Enter new user name:");
-      if (!newUser || !newUser.trim()) return;
-      const newPassword = prompt("Set a password for " + newUser + ":");
-      if (!newPassword) return;
-      localStorage.setItem(`user_password_${newUser}`, btoa(newPassword));
-      localStorage.setItem(`progress_${newUser}`, JSON.stringify([]));
-      saveUserList(newUser);
-      localStorage.setItem('current_user', newUser);
-      location.reload();
-    }
+      const quizData = selected.map(item => {
+        const distractors = allData
+          .filter(d => d.term !== item.term)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+          .map(d => d.term);
 
-    function forgotPassword() {
-      const user = prompt("Enter your username:");
-      if (!user || !localStorage.getItem(`user_password_${user}`)) {
-        alert("User not found.");
-        return;
-      }
-      if (confirm(`Do you want to reset the password for ${user}? This will erase your existing progress.`)) {
-        localStorage.removeItem(`user_password_${user}`);
-        localStorage.removeItem(`progress_${user}`);
-        alert("Password and progress reset. You can now add the user again.");
-        location.reload();
-      }
-    }
-
-    function switchUser(user) {
-      const storedPassword = localStorage.getItem(`user_password_${user}`);
-      const input = prompt("Enter password for " + user + ":");
-      if (!input || btoa(input) !== storedPassword) {
-        alert("Incorrect password.");
-        document.getElementById('userSelector').value = localStorage.getItem('current_user');
-        return;
-      }
-      localStorage.setItem('current_user', user);
-      location.reload();
-    }
-
-    function resetProgress() {
-      if (confirm(`Reset progress for ${currentUser}?`)) {
-        localStorage.removeItem(`progress_${currentUser}`);
-        location.reload();
-      }
-    }
-
-    function exportProgress() {
-      const data = localStorage.getItem(`progress_${currentUser}`);
-      const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${currentUser}_progress.json`;
-      a.click();
-    }
-
-    function importProgress(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          try {
-            const data = JSON.parse(e.target.result);
-            localStorage.setItem(`progress_${currentUser}`, JSON.stringify(data));
-            alert("Progress imported!");
-            location.reload();
-          } catch {
-            alert("Invalid file format");
-          }
+        return {
+          question: item.definition,
+          correct_answer: item.term,
+          icon: `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}`,
+          options: [...distractors, item.term].sort(() => 0.5 - Math.random())
         };
-        reader.readAsText(file);
+      });
+
+      initQuiz(quizData);
+    });
+
+  let current = 0, score = 0, seconds = 0, timerInterval;
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const scoreEl = document.getElementById('score');
+  const timerEl = document.getElementById('timer');
+  const iconEl = document.getElementById('icon');
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  function initQuiz(quizData) {
+    function loadQuestion() {
+      const q = quizData[current];
+      questionEl.innerHTML = `<strong>Definition:</strong> ${q.question}`;
+      iconEl.src = q.icon;
+      optionsEl.innerHTML = '';
+      q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.innerText = option;
+        btn.onclick = () => checkAnswer(option, q.correct_answer, q.question);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct, questionText) {
+      const isCorrect = selected === correct;
+      if (isCorrect) {
+        score++;
+        alert('✅ Correct!');
+      } else {
+        alert(`❌ Wrong! Correct answer: ${correct}`);
+      }
+
+      userProgress.push({
+        user: currentUser,
+        question: questionText,
+        term: correct,
+        selected: selected,
+        correct: isCorrect,
+        timestamp: new Date().toISOString()
+      });
+
+      scoreEl.innerText = `Score: ${score} / ${current + 1}`;
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= quizData.length) {
+        clearInterval(timerInterval);
+        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
+        console.table(userProgress);
+        localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
+        current = 0; score = 0; seconds = 0;
+        userProgress.length = 0;
+        startTimer();
+        loadQuestion();
+      } else {
+        loadQuestion();
       }
     }
 
-    // User setup
-    const userSelector = document.getElementById('userSelector');
-    const userControls = document.getElementById('userControls');
-    const users = [...Object.keys(localStorage)].filter(k => k.startsWith('user_password_')).map(k => k.replace('user_password_', ''));
-    userSelector.innerHTML = users.map(u => `<option value="${u}">${u}</option>`).join('');
-    const currentUser = localStorage.getItem('current_user');
-    if (currentUser) {
-      userSelector.value = currentUser;
-      if (currentUser === 'Salleh') userControls.classList.add('admin-visible');
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        seconds++;
+        timerEl.innerText = `Time: ${formatTime(seconds)}`;
+        if (seconds >= 3600) {
+          clearInterval(timerInterval);
+          alert(`⏰ Time's up! Final score: ${score}/${quizData.length}`);
+        }
+      }, 1000);
     }
-  </script>
+
+    window.nextQuestion = nextQuestion;
+    loadQuestion();
+    startTimer();
+  }
+</script>
+
 </body>
 </html>
