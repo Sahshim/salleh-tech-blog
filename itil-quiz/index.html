@@ -16,27 +16,30 @@
     canvas { width: 100% !important; height: auto !important; }
     .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
     .accordion-content { display: none; margin-top: 0.5rem; }
+    #admin-panel { display: none; margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
-
-  <!-- LOGIN SCREEN -->
   <div class="quiz-container" id="login-screen">
     <h2>ITIL Quiz Login</h2>
-    <input type="text" id="username" placeholder="Username" />
+    <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
+    <button onclick="firebaseLogin()">Login / Register</button>
     <p id="login-error" style="color:red;"></p>
   </div>
 
-  <!-- START SCREEN -->
   <div class="quiz-container" id="start-screen" style="display:none;">
     <h2>Welcome to the ITIL Adaptive Quiz</h2>
     <p>Test your knowledge and track your progress.</p>
     <button onclick="startQuiz()">Start Quiz</button>
+    <div id="admin-panel">
+      <h3>Admin Panel: Add User</h3>
+      <p>New users can sign up directly from login screen.</p>
+    </div>
   </div>
 
-  <!-- QUIZ SECTION -->
   <div class="quiz-container" id="quiz-section" style="display: none;">
     <div class="question-image"><img src="" alt="concept" id="icon" /></div>
     <h2 id="question">Loading...</h2>
@@ -54,23 +57,51 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const ADMIN_USER = "Salleh";
-    const ADMIN_PASS = "sa7144";
-    const currentUser = ADMIN_USER;
-    const userProgress = JSON.parse(localStorage.getItem(`progress_${currentUser}`)) || [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyDejyImoxjN5WW8UxOucCasDPwPNrhoPNc",
+      authDomain: "itilmcq.firebaseapp.com",
+      projectId: "itilmcq",
+      storageBucket: "itilmcq.appspot.com",
+      messagingSenderId: "535085938419",
+      appId: "1:535085938419:web:example"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    let loggedInUser = '';
     let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
     let questionEl, optionsEl, scoreEl, timerEl, iconEl;
+
+    function firebaseLogin() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorEl = document.getElementById('login-error');
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(res => onLogin(res.user))
+        .catch(() => {
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(res => onLogin(res.user))
+            .catch(err => errorEl.textContent = '❌ ' + err.message);
+        });
+    }
+
+    function onLogin(user) {
+      loggedInUser = user.email;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+      if (loggedInUser === 'salleh@admin.com') {
+        document.getElementById('admin-panel').style.display = 'block';
+      }
+    }
 
     fetch('itil_data_10_final.json')
       .then(res => res.json())
       .then(allData => {
         const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
         quizData = selected.map(item => {
-          const distractors = allData
-            .filter(d => d.term !== item.term)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3)
-            .map(d => d.term);
+          const distractors = allData.filter(d => d.term !== item.term).sort(() => 0.5 - Math.random()).slice(0, 3).map(d => d.term);
           return {
             question: item.definition,
             correct_answer: item.term,
@@ -79,18 +110,6 @@
           };
         });
       });
-
-    function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-      const errorMsg = document.getElementById('login-error');
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('start-screen').style.display = 'block';
-      } else {
-        errorMsg.textContent = '❌ Invalid username or password.';
-      }
-    }
 
     function startQuiz() {
       document.getElementById('start-screen').style.display = 'none';
@@ -101,7 +120,7 @@
       timerEl = document.getElementById('timer');
       iconEl = document.getElementById('icon');
       score = 0; current = 0; seconds = 0;
-      userProgress.length = 0;
+      localStorage.removeItem(`progress_${loggedInUser}`);
       startTimer();
       loadQuestion();
     }
@@ -131,7 +150,10 @@
       const isCorrect = selected === correct;
       alert(isCorrect ? '✅ Correct!' : `❌ Wrong! Correct answer: ${correct}`);
       if (isCorrect) score++;
-      userProgress.push({ user: currentUser, question: questionText, term: correct, selected, correct: isCorrect, timestamp: new Date().toISOString() });
+      const key = `progress_${loggedInUser}`;
+      const progress = JSON.parse(localStorage.getItem(key)) || [];
+      progress.push({ user: loggedInUser, question: questionText, term: correct, selected, correct: isCorrect, timestamp: new Date().toISOString() });
+      localStorage.setItem(key, JSON.stringify(progress));
       scoreEl.innerText = `Score: ${score} / ${current + 1}`;
     }
 
@@ -140,7 +162,6 @@
       if (current >= quizData.length) {
         clearInterval(timerInterval);
         alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time: ${formatTime(seconds)}`);
-        localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
         drawChart();
       } else {
         loadQuestion();
@@ -166,8 +187,10 @@
     }
 
     function drawChart(page = 0, pageSize = 10) {
+      const key = `progress_${loggedInUser}`;
+      const progress = JSON.parse(localStorage.getItem(key)) || [];
       const counts = {};
-      userProgress.forEach(entry => {
+      progress.forEach(entry => {
         if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0, definition: entry.question };
         entry.correct ? counts[entry.term].correct++ : counts[entry.term].incorrect++;
       });
