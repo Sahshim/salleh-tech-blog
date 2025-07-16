@@ -172,13 +172,13 @@
       apiKey: "AIzaSyDejyImoxjN5WW8UxOucCasDPwPNrhoPNc",
       authDomain: "itilmcq.firebaseapp.com",
       projectId: "itilmcq",
-      storageBucket: "itilmcq.appspot.com", // FIXED: Corrected to exactly match your project's config
+      storageBucket: "itilmcq.appspot.com", // FIXED: Corrected to match your project's config
       messagingSenderId: "535085938419",
       appId: "1:535085938419:web:8549b9b3d11dd26a756986",
       measurementId: "G-PW7SPRRLVW"
     };
 
-    // Initialize Firebase
+    // Initialize Firebase using the compat libraries
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -193,8 +193,6 @@
     const messageArea = document.getElementById('message-area');
 
     // --- AUTH STATE LISTENER ---
-    // This is the best practice for managing user login state.
-    // It runs when the page loads and whenever the user's login state changes.
     auth.onAuthStateChanged(user => {
         loadingSpinner.classList.add('hidden');
         if (user) {
@@ -202,11 +200,9 @@
             console.log('User is logged in:', user.email);
             welcomeEmailEl.textContent = `Logged in as ${user.email}`;
             loginScreen.classList.add('hidden');
-            quizScreen.classList.add('hidden'); // Ensure quiz is hidden on login
+            quizScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
 
-            // SECURE ADMIN CHECK: This is where you would check for an admin custom claim.
-            // This requires backend logic (e.g., a Cloud Function) to set the claim.
             user.getIdTokenResult().then(idTokenResult => {
                 if (idTokenResult.claims.admin) {
                     console.log('User is an admin.');
@@ -293,6 +289,9 @@
             case 'auth/weak-password':
                 message = "Password should be at least 6 characters long.";
                 break;
+            case 'auth/api-key-not-valid':
+                 message = "The Firebase API Key is not valid. Please check your configuration.";
+                 break;
             default:
                 message = "An error occurred. Please try again.";
                 console.error("Auth Error:", error);
@@ -314,16 +313,12 @@
     function startQuiz() {
       startScreen.classList.add('hidden');
       quizScreen.classList.remove('hidden');
-      // TODO: Add your quiz initialization logic here.
-      // e.g., fetch questions from Firestore, set up the first question.
       console.log("Quiz started!");
     }
 
     function nextQuestion() {
-        // TODO: Add logic to show the next question.
         console.log("Next question requested.");
     }
-
   </script>
 </body>
 </html>
