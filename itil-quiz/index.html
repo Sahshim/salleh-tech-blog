@@ -70,7 +70,41 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // rest of the JS remains the same
+    function firebaseLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('login-error');
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          onLoginSuccess(userCredential.user);
+        })
+        .catch(error => {
+          if (error.code === 'auth/user-not-found') {
+            auth.createUserWithEmailAndPassword(email, password)
+              .then(userCredential => {
+                onLoginSuccess(userCredential.user);
+              })
+              .catch(err => errorEl.textContent = err.message);
+          } else {
+            errorEl.textContent = error.message;
+          }
+        });
+    }
+
+    function onLoginSuccess(user) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+
+      if (user.email === 'salleh@admin.com') {
+        document.getElementById('admin-panel').style.display = 'block';
+      }
+    }
+
+    function startQuiz() {
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('quiz-section').style.display = 'block';
+    }
   </script>
 </body>
 </html>
