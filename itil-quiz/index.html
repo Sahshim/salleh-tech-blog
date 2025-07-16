@@ -2,132 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ITIL Adaptive Quiz</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 0;
-    }
-    .quiz-container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .question-image {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .question-image img {
-      max-width: 150px;
-    }
-    h2 {
-      font-size: 1.2rem;
-    }
-    .options {
-      margin-top: 1rem;
-    }
-    .options button {
-      display: block;
-      margin: 0.5rem 0;
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background: #f9f9f9;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .options button:hover {
-      background: #e0e0e0;
-    }
-    .options button.disabled {
-      pointer-events: none;
-      opacity: 0.6;
-    }
-    .score,
-    .timer {
-      margin-top: 1.5rem;
-      font-weight: bold;
-    }
-    .next {
-      margin-top: 1rem;
-    }
-    .chart-container {
-      margin-top: 2rem;
-    }
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-    canvas {
-      width: 100% !important;
-      height: auto !important;
-    }
-    .accordion-item {
-      background: #f9f9f9;
-      margin: 0.5rem 0;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .accordion-item.active {
-      background: #e6f7ff;
-    }
-    .accordion-content {
-      display: none;
-      margin-top: 0.5rem;
-    }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+    .quiz-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input, button { padding: 0.5rem; margin-top: 0.5rem; width: 100%; max-width: 300px; }
+    .question-image img { max-width: 150px; }
+    .options button { margin: 0.5rem 0; width: 100%; }
+    .options button:hover { background: #e0e0e0; }
+    .disabled { pointer-events: none; opacity: 0.6; }
+    .chart-container { margin-top: 2rem; }
+    canvas { width: 100% !important; height: auto !important; }
+    .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+    .accordion-content { display: none; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
+
+  <!-- LOGIN SCREEN -->
+  <div class="quiz-container" id="login-screen">
+    <h2>ITIL Quiz Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
+
   <!-- START SCREEN -->
-  <div class="quiz-container" id="start-screen">
+  <div class="quiz-container" id="start-screen" style="display:none;">
     <h2>Welcome to the ITIL Adaptive Quiz</h2>
     <p>Test your knowledge and track your progress.</p>
-    <button onclick="startQuiz()" style="padding: 1rem; font-size: 1rem;">Start Quiz</button>
+    <button onclick="startQuiz()">Start Quiz</button>
   </div>
 
   <!-- QUIZ SECTION -->
   <div class="quiz-container" id="quiz-section" style="display: none;">
-    <div class="question-image">
-      <img src="" alt="concept" id="icon" />
-    </div>
+    <div class="question-image"><img src="" alt="concept" id="icon" /></div>
     <h2 id="question">Loading...</h2>
     <div class="options" id="options"></div>
     <div class="score" id="score"></div>
     <div class="timer" id="timer">Time: 00:00</div>
-    <button class="next" onclick="nextQuestion()">Next Question</button>
+    <button onclick="nextQuestion()">Next Question</button>
     <div class="chart-container">
       <canvas id="progressChart"></canvas>
       <div class="pagination" id="chartPagination"></div>
-      <div class="filters">
-        <label><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-      </div>
+      <label><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
       <div id="accordion"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const currentUser = "Salleh";
+    const ADMIN_USER = "Salleh";
+    const ADMIN_PASS = "sa7144";
+    const currentUser = ADMIN_USER;
     const userProgress = JSON.parse(localStorage.getItem(`progress_${currentUser}`)) || [];
     let quizData = [];
     let current = 0, score = 0, seconds = 0, timerInterval;
     let questionEl, optionsEl, scoreEl, timerEl, iconEl;
 
-    // Load data but don't start quiz yet
+    // Load quiz data from JSON
     fetch('itil_data_10_final.json')
-      .then(response => response.json())
+      .then(res => res.json())
       .then(allData => {
         const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
         quizData = selected.map(item => {
@@ -144,6 +81,20 @@
           };
         });
       });
+
+    // LOGIN FUNCTION
+    function login() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('login-error');
+
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'block';
+      } else {
+        errorMsg.textContent = '❌ Invalid username or password.';
+      }
+    }
 
     function startQuiz() {
       document.getElementById('start-screen').style.display = 'none';
@@ -168,8 +119,7 @@
       const q = quizData[current];
       questionEl.innerHTML = `<strong>Definition:</strong> ${q.question}`;
       iconEl.src = q.icon || 'default.png';
-      iconEl.onerror = () => iconEl.src = 'default.png';
-
+      iconEl.onerror = () => { iconEl.src = 'default.png'; };
       optionsEl.innerHTML = '';
       q.options.forEach(option => {
         const btn = document.createElement('button');
@@ -186,12 +136,8 @@
 
     function checkAnswer(selected, correct, questionText) {
       const isCorrect = selected === correct;
-      if (isCorrect) {
-        score++;
-        alert('✅ Correct!');
-      } else {
-        alert(`❌ Wrong! Correct answer: ${correct}`);
-      }
+      alert(isCorrect ? '✅ Correct!' : `❌ Wrong! Correct answer: ${correct}`);
+      if (isCorrect) score++;
 
       userProgress.push({
         user: currentUser,
@@ -209,7 +155,7 @@
       current++;
       if (current >= quizData.length) {
         clearInterval(timerInterval);
-        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time taken: ${formatTime(seconds)}`);
+        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time: ${formatTime(seconds)}`);
         localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
         drawChart();
       } else {
@@ -220,7 +166,6 @@
     function startTimer() {
       clearInterval(timerInterval);
       seconds = 0;
-      timerEl.innerText = `Time: 00:00`;
       timerInterval = setInterval(() => {
         seconds++;
         timerEl.innerText = `Time: ${formatTime(seconds)}`;
@@ -231,57 +176,52 @@
       }, 1000);
     }
 
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60), s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function drawChart(page = 0, pageSize = 10) {
       const counts = {};
       userProgress.forEach(entry => {
         if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0, definition: entry.question };
-        if (entry.correct) counts[entry.term].correct++;
-        else counts[entry.term].incorrect++;
+        entry.correct ? counts[entry.term].correct++ : counts[entry.term].incorrect++;
       });
-      let allLabels = Object.keys(counts);
+      let labels = Object.keys(counts);
       if (document.getElementById('filterIncorrect').checked) {
-        allLabels = allLabels.filter(label => counts[label].incorrect > 0);
+        labels = labels.filter(label => counts[label].incorrect > 0);
       }
-      const pageLabels = allLabels.slice(page * pageSize, (page + 1) * pageSize);
-      const correctData = pageLabels.map(label => counts[label].correct);
-      const incorrectData = pageLabels.map(label => counts[label].incorrect);
+
+      const currentPage = labels.slice(page * pageSize, (page + 1) * pageSize);
+      const correctData = currentPage.map(label => counts[label].correct);
+      const incorrectData = currentPage.map(label => counts[label].incorrect);
 
       const ctx = document.getElementById('progressChart');
       if (window.chartInstance) window.chartInstance.destroy();
       window.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: pageLabels,
+          labels: currentPage,
           datasets: [
-            { label: 'Correct', data: correctData, backgroundColor: 'rgba(75, 192, 192, 0.7)' },
-            { label: 'Incorrect', data: incorrectData, backgroundColor: 'rgba(255, 99, 132, 0.7)' }
+            { label: 'Correct', data: correctData, backgroundColor: 'rgba(75,192,192,0.7)' },
+            { label: 'Incorrect', data: incorrectData, backgroundColor: 'rgba(255,99,132,0.7)' }
           ]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Your Progress by Term' }
-          }
+          plugins: { legend: { position: 'top' }, title: { display: true, text: 'Progress by Term' } }
         }
       });
 
       const pagination = document.getElementById('chartPagination');
       pagination.innerHTML = `
-        <button onclick="drawChart(${page - 1})" ${page <= 0 ? 'disabled' : ''}>⬅ Prev Page</button>
-        Showing terms ${page * pageSize + 1}–${Math.min((page + 1) * pageSize, allLabels.length)} of ${allLabels.length}
-        <button onclick="drawChart(${page + 1})" ${(page + 1) * pageSize >= allLabels.length ? 'disabled' : ''}>Next Page ➡</button>
+        <button onclick="drawChart(${page - 1})" ${page <= 0 ? 'disabled' : ''}>⬅ Prev</button>
+        Showing terms ${page * pageSize + 1}–${Math.min((page + 1) * pageSize, labels.length)} of ${labels.length}
+        <button onclick="drawChart(${page + 1})" ${(page + 1) * pageSize >= labels.length ? 'disabled' : ''}>Next ➡</button>
       `;
 
       const accordion = document.getElementById('accordion');
       accordion.innerHTML = '';
-      pageLabels.forEach(label => {
+      currentPage.forEach(label => {
         const item = document.createElement('div');
         item.className = 'accordion-item';
         item.innerHTML = `<strong>${label}</strong>`;
@@ -296,8 +236,9 @@
       });
     }
 
-    // Expose nextQuestion so button can call it
+    // Make global
     window.nextQuestion = nextQuestion;
+    window.drawChart = drawChart;
   </script>
 </body>
 </html>
