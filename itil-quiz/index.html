@@ -172,7 +172,7 @@
       apiKey: "AIzaSyDejyImoxjN5WW8UxOucCasDPwPNrhoPNc",
       authDomain: "itilmcq.firebaseapp.com",
       projectId: "itilmcq",
-      storageBucket: "itilmcq.appspot.com",
+      storageBucket: "itilmcq.firebasestorage.app", // FIXED: Corrected to exactly match your project's config
       messagingSenderId: "535085938419",
       appId: "1:535085938419:web:8549b9b3d11dd26a756986",
       measurementId: "G-PW7SPRRLVW"
@@ -296,8 +296,7 @@
                  message = "The Firebase API Key is not valid. Please check your configuration.";
                  break;
             default:
-                // FIXED: For any other error, display the actual message from Firebase.
-                // This will give us the specific reason for the failure.
+                // For any other error, display the actual message from Firebase.
                 message = error.message;
         }
         showMessage(message, 'error');
