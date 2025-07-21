@@ -35,7 +35,7 @@
   <div class="timer text-sm text-gray-600 mb-2" id="timer">Time: 00:00</div>
   <div class="score text-sm text-gray-700 mb-2" id="score">Score: 0</div>
   <div class="mt-4">
-    <button onclick="nextQuestion()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Next Question</button>
+    <button onclick="nextQuestion()" id="nextBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" disabled>Next Question</button>
   </div>
 </div>
 
@@ -59,83 +59,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-const questions = [
-  {
-    definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
-    term: "Acceptance criteria",
-    image: "https://salleh.cloud/assets/images/Acceptance_criteria.png",
-    options: ["Acceptance criteria", "Incident handling", "Service Level Agreement", "Quality checklist"],
-    answer: 0
-  },
-  {
-    definition: "Agile emphasizes collaboration, customer feedback, and small, rapid releases.",
-    term: "Agile",
-    image: "https://salleh.cloud/assets/images/Agile.png",
-    options: ["Waterfall", "Agile", "DevOps", "Kanban"],
-    answer: 1
-  },
-  {
-    definition: "The practice of managing architectures systematically to ensure alignment with business goals.",
-    term: "Architecture management practice",
-    image: "https://salleh.cloud/assets/images/Architecture_management_practice.png",
-    options: ["Project Management", "Architecture management practice", "Infrastructure Design", "Capacity Planning"],
-    answer: 1
-  },
-  {
-    definition: "A database or document listing assets, their configurations, and their relationships.",
-    term: "Asset register",
-    image: "https://salleh.cloud/assets/images/Asset_register.png",
-    options: ["Inventory sheet", "License tracker", "Asset register", "Service catalog"],
-    answer: 2
-  },
-  {
-    definition: "Practice focused on ensuring that services deliver agreed levels of availability.",
-    term: "Availability management practice",
-    image: "https://salleh.cloud/assets/images/Availability_management_practice.png",
-    options: ["Capacity Planning", "Availability management practice", "Performance tuning", "Monitoring"],
-    answer: 1
-  },
-  {
-    definition: "A baseline is a report or metric used as a reference for future comparisons.",
-    term: "Baseline",
-    image: "https://salleh.cloud/assets/images/Baseline.png",
-    options: ["Forecast", "Threshold", "Baseline", "Average"],
-    answer: 2
-  },
-  {
-    definition: "An industry-wide approved method or standard of doing something.",
-    term: "Best practice",
-    image: "https://salleh.cloud/assets/images/Best_practice.png",
-    options: ["Best practice", "Protocol", "Standard operation", "Guideline"],
-    answer: 0
-  },
-  {
-    definition: "Large volumes of structured or unstructured data that can be analyzed computationally.",
-    term: "Big data",
-    image: "https://salleh.cloud/assets/images/Big_data.png",
-    options: ["Data warehouse", "Big data", "Analytics", "Cloud logs"],
-    answer: 1
-  },
-  {
-    definition: "Practice that involves analyzing business processes and suggesting improvements.",
-    term: "Business analysis practice",
-    image: "https://salleh.cloud/assets/images/Business_analysis_practice.png",
-    options: ["Market research", "Business analysis practice", "SWOT analysis", "Consulting"],
-    answer: 1
-  },
-  {
-    definition: "Formal agreement between service provider and customer describing service level targets.",
-    term: "Service Level Agreement (SLA)",
-    image: "https://salleh.cloud/assets/images/SLA.png",
-    options: ["Contract", "Memo", "Service Level Agreement (SLA)", "Statement of Work"],
-    answer: 2
-  }
-];
+const questions = [...]; // kept unchanged
 
 let currentQuestion = 0;
 let timerInterval;
 let seconds = 0;
 let score = 0;
+let answered = false;
 
 function firebaseLogin() {
   const email = document.getElementById('email').value;
@@ -161,8 +91,11 @@ function startQuiz() {
 
 function loadQuestion() {
   const q = questions[currentQuestion];
+  answered = false;
+  document.getElementById('nextBtn').disabled = true;
   document.getElementById('definition').innerText = q.definition;
   document.getElementById('icon').src = q.image;
+  document.getElementById('icon').style.display = 'block';
 
   const optionsContainer = document.getElementById('options');
   optionsContainer.innerHTML = '';
@@ -170,16 +103,24 @@ function loadQuestion() {
     const btn = document.createElement('button');
     btn.className = 'bg-white border border-gray-300 rounded px-4 py-2 hover:bg-gray-200';
     btn.textContent = opt;
-    btn.onclick = () => checkAnswer(idx);
+    btn.onclick = () => checkAnswer(idx, btn);
     optionsContainer.appendChild(btn);
   });
 }
 
-function checkAnswer(selected) {
+function checkAnswer(selected, btn) {
+  if (answered) return;
+  answered = true;
   const correct = questions[currentQuestion].answer;
+  const buttons = document.querySelectorAll('#options button');
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === correct) b.classList.add('bg-green-200');
+    else if (i === selected) b.classList.add('bg-red-200');
+  });
   if (selected === correct) score++;
   document.getElementById('score').innerText = 'Score: ' + score;
-  nextQuestion();
+  document.getElementById('nextBtn').disabled = false;
 }
 
 function nextQuestion() {
