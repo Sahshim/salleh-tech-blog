@@ -40,7 +40,8 @@
 
   <!-- QUIZ SECTION -->
   <div class="quiz-container" id="quiz-section" style="display: none;">
-    <!-- Content intentionally left unchanged -->
+    <h2>Quiz started!</h2>
+    <p>This is a placeholder for the actual quiz content.</p>
   </div>
 
   <script>
@@ -75,6 +76,11 @@
             })
             .catch(error => errorMsg.textContent = error.message);
         });
+    }
+
+    function startQuiz() {
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('quiz-section').style.display = 'block';
     }
   </script>
 
