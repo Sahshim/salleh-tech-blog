@@ -94,12 +94,26 @@ function firebaseLogin() {
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
 
-  // Admin check
   if (emailInput.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     localStorage.setItem("isAdmin", "true");
   } else {
     localStorage.removeItem("isAdmin");
   }
+
+  auth.signInWithEmailAndPassword(emailInput, password)
+    .then(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+    })
+    .catch(() => {
+      auth.createUserWithEmailAndPassword(emailInput, password)
+        .then(() => {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('start-screen').style.display = 'block';
+        })
+        .catch(error => errorEl.textContent = error.message);
+    });
+}
 
   auth.signInWithEmailAndPassword(emailInput, password)
     .then(() => {
