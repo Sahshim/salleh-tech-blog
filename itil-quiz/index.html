@@ -73,7 +73,11 @@ const questions = [
   { term: "Business case", definition: "A justification for expenditure of organizational resources, providing information about costs, benefits, options, risks, and issues.", answer: 0, options: ["Business case", "ROI analysis", "Cost-benefit report", "Feasibility study"], image: "assets/images/Business case.png" }
 ];
 
-let currentQuestion = 0, timerInterval, seconds = 0, score = 0, answered = false;
+let currentQuestion = 0;
+let timerInterval;
+let seconds = 0;
+let score = 0;
+let answered = false;
 
 function firebaseLogin() {
   const email = document.getElementById('email').value;
@@ -111,9 +115,8 @@ function loadQuestion() {
   answered = false;
   document.getElementById('nextBtn').disabled = true;
   document.getElementById('definition').innerText = q.definition;
-  const img = document.getElementById('icon');
-  img.src = q.image || `assets/images/${q.term}.png`;
-  img.style.display = 'block';
+  document.getElementById('icon').src = q.image || `assets/images/${q.term}.png`;
+  document.getElementById('icon').style.display = 'block';
   document.getElementById('feedback').innerText = '';
 
   const optionsContainer = document.getElementById('options');
