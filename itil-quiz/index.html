@@ -43,6 +43,14 @@
   </div>
 </div>
 
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md text-center">
+    <p id="feedbackText" class="text-lg font-semibold"></p>
+    <button onclick="closeFeedbackModal()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">OK</button>
+  </div>
+</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc",
@@ -77,6 +85,15 @@ function firebaseLogin() {
     });
 }
 
+function showFeedbackModal(text) {
+  document.getElementById('feedbackText').textContent = text;
+  document.getElementById('feedbackModal').classList.remove('hidden');
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.add('hidden');
+}
+
 const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
 let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
 let questionEl, optionsEl, scoreEl, timerEl, iconEl;
@@ -105,8 +122,10 @@ function loadQuestion() {
       if (option === q.correct_answer) {
         score++;
         btn.classList.add('bg-green-200');
+        showFeedbackModal("Correct! 🎉");
       } else {
         btn.classList.add('bg-red-200');
+        showFeedbackModal(`Incorrect. Correct answer: ${q.correct_answer}`);
       }
       userProgress.push({ question: q.question, selected: option, correct: q.correct_answer });
       scoreEl.textContent = `Score: ${score}/${quizData.length}`;
