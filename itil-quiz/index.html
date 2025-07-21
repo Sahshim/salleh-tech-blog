@@ -1,340 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITIL Glossary Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .option-btn {
-            transition: all 0.2s ease-in-out;
-        }
-        .option-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .correct {
-            background-color: #22c55e !important; /* green-500 */
-            color: white !important;
-            border-color: #16a34a !important; /* green-600 */
-        }
-        .incorrect {
-            background-color: #ef4444 !important; /* red-500 */
-            color: white !important;
-            border-color: #dc2626 !important; /* red-600 */
-        }
-    </style>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>ITIL 4 Foundation Quiz</title>
+    <script src=\"https://cdn.tailwindcss.com\"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen">
+<body class=\"bg-gray-100\">
 
-    <div id="app-container" class="w-full max-w-4xl mx-auto p-4">
-
-        <!-- Login Page -->
-        <div id="login-page" class="bg-white p-8 rounded-xl shadow-lg text-center">
-            <h1 class="text-4xl font-bold text-gray-700 mb-4">ITIL® 4 Foundation Quiz</h1>
-            <p class="text-gray-600 mb-8">Test your knowledge of the ITIL 4 framework. Please log in to begin.</p>
-            <div class="max-w-sm mx-auto">
-                <div class="mb-4">
-                    <label for="username" class="block text-left text-gray-700 font-medium mb-2">Username</label>
-                    <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., student123">
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-left text-gray-700 font-medium mb-2">Password</label>
-                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="********">
-                </div>
-                <button id="login-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
-                    Start Quiz
-                </button>
-            </div>
-        </div>
-
-        <!-- Quiz Page -->
-        <div id="quiz-page" class="hidden">
-            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-                <!-- Header -->
-                <div class="flex justify-between items-center border-b pb-4 mb-6">
-                    <h2 class="text-2xl font-bold text-gray-700">ITIL Quiz</h2>
-                    <div>
-                        <span id="question-counter" class="text-lg font-semibold text-gray-600"></span>
-                        <span class="text-gray-500">|</span>
-                        <span id="score-counter" class="text-lg font-semibold text-blue-600">Score: 0</span>
-                    </div>
-                </div>
-
-                <!-- Question Area -->
-                <div id="question-area">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-6">
-                        <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden shadow-inner">
-                            <img id="question-image" src="" alt="Question Image" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                             <p class="text-gray-500 mb-2 font-medium">What is the definition of:</p>
-                            <h3 id="question-term" class="text-3xl font-bold text-gray-800"></h3>
-                        </div>
-                    </div>
-
-                    <!-- Options -->
-                    <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Options will be dynamically inserted here -->
-                    </div>
-                </div>
-
-                <!-- Feedback and Controls -->
-                <div class="mt-8 text-center">
-                    <div id="feedback-message" class="text-2xl font-bold mb-4 h-8"></div>
-                    <button id="next-btn" class="hidden bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
-                        Next Question
-                    </button>
-                </div>
-
-                 <!-- Results Screen -->
-                <div id="results-page" class="hidden text-center py-10">
-                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
-                    <p class="text-xl text-gray-600 mb-6">Your final score is:</p>
-                    <p id="final-score" class="text-6xl font-bold text-blue-600 mb-8"></p>
-                    <button id="restart-btn" class="bg-green-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-600 transition duration-300 shadow-md">
-                        Restart Quiz
-                    </button>
-                </div>
-
-            </div>
-        </div>
+<div id=\"login\" class=\"flex items-center justify-center h-screen\">
+    <div class=\"bg-white shadow-xl rounded-xl p-8 w-full max-w-md\">
+        <h1 class=\"text-2xl font-bold text-center mb-4\">ITIL® 4 Foundation Quiz</h1>
+        <p class=\"text-center mb-6\">Test your knowledge of the ITIL 4 framework. Please log in to begin.</p>
+        <input type=\"text\" id=\"username\" placeholder=\"e.g., student123\" class=\"border rounded-md p-2 w-full mb-4\">
+        <input type=\"password\" id=\"password\" placeholder=\"********\" class=\"border rounded-md p-2 w-full mb-4\">
+        <button onclick=\"startQuiz()\" class=\"bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full\">
+            Start Quiz
+        </button>
     </div>
+</div>
 
-    <script>
-        // --- DATA PARSING AND PREPARATION ---
+<div id=\"quiz\" class=\"hidden container mx-auto p-4\">
+    <h2 id=\"question\" class=\"text-xl font-semibold mb-4\"></h2>
+    <img id=\"questionImage\" src=\"\" alt=\"ITIL Term Image\" class=\"mb-4 max-h-64\">
+    <div id=\"definition\" class=\"text-lg\"></div>
+    <button onclick=\"nextQuestion()\" class=\"mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded\">
+        Next
+    </button>
+</div>
 
-        // Raw data from the provided CSV file.
-        const rawData = `
-        ,,,Front: Acceptance criteria,,,
-        ,,,Back: A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders. 2,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Agile,,,
-        ,,,Back: "An umbrella term for a collection of frameworks and techniques that together enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing. There are several specific methods (or frameworks) that are classed as Agile, such as Scrum, Lean, and Kanban. 3",,,
-        ,,,Image:,NaN,,
-        ,,,Front: Architecture management practice,,,
-        ,,,Back: The practice of providing an understanding of all the different elements that make up an organization and how those elements relate to one another. 4,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Asset register,,,
-        ,,,Back: "A database or list of assets, capturing key attributes such as ownership and financial value. 5",,,
-        ,,,Image:,NaN,,
-        ,,,Front: Availability,,,
-        ,,,Back: The ability of an IT service or other configuration item to perform its agreed function when required. 6,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Availability management practice,,,
-        ,,,Back: The practice of ensuring that all IT services and CIs meet their agreed availability targets. 7,,,
-        ,,,Image:https://i.imgur.com/3ZgE5e9.png,,
-        ,,,Front: Baseline,,,
-        ,,,Back: A report or metric that has been reviewed and agreed upon and serves as a reference point for later comparison. 8,,,
-        ,,,Image:https://i.imgur.com/L8FwM5c.png,,
-        ,,,Front: Big data,,,
-        ,,,Back: The use of very large volumes of structured and unstructured data from a variety of sources to gain new insights. 9,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Business analysis practice,,,
-        ,,,Back: The practice of analysing a business or some element of it, defining its associated needs, and recommending solutions to address these needs and/or solve a business problem. 10,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Business case,,,
-        ,,,Back: A justification for the expenditure of organizational resources, providing information about costs, benefits, options, risks, and issues. 11,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Business impact analysis (BIA),,,
-        ,,,Back: A key activity in the service continuity management practice that identifies vital business functions and their dependencies. 12,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Business relationship manager (BRM),,,
-        ,,,Back: A role responsible for maintaining a good relationship with one or more customers. 13,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Call,,,
-        ,,,Back: An interaction (e.g. a telephone call, a visit to a service desk) with the service desk. A call could result in an incident or a service request being logged. 14,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Call/contact centre,,,
-        ,,,Back: An organization or business unit that handles telephone calls. 15,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Capacity and performance management practice,,,
-        ,,,Back: The practice of ensuring that services achieve agreed and expected performance levels, satisfying current and future demand in a cost-effective way. 16,,,
-        ,,,Image:https://i.imgur.com/nL2gGvX.png,,
-        ,,,Front: Capacity planning,,,
-        ,,,Back: The activity of creating a plan that manages resources to meet the demands for services. 17,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Change,,,
-        ,,,Back: The addition, modification, or removal of anything that could have a direct or indirect effect on services. 18,,,
-        ,,,Image:,NaN,,
-        ,,,Front: Change authority,,,
-        ,,,Back: The person or group who authorizes a change. 19,,,
-        ,,,Image:https://i.imgur.com/V7Yqg3P.png,,
-        ,,,Front: Change control practice,,,
-        ,,,Back: The practice of ensuring that risks are properly assessed, authorizing changes to proceed, and managing a change schedule in order to maximize the number of successful IT changes. 20,,,
-        ,,,Image:,NaN,,
-        `;
+<script>
+    const questions = [
+        {\"term\":\"Acceptance criteria\",\"definition\":\"A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.\",\"image\":\"Acceptance_criteria.png\"},
+        {\"term\":\"Agile\",\"definition\":\"An umbrella term for a collection of frameworks and techniques enabling teams and individuals to collaborate, prioritize, deliver iteratively and incrementally, and use timeboxing methods like Scrum, Lean, and Kanban.\",\"image\":\"Agile.png\"},
+        {\"term\":\"Architecture management practice\",\"definition\":\"Providing understanding of organizational elements and their interrelations.\",\"image\":\"Architecture_management_practice.png\"},
+        {\"term\":\"Asset register\",\"definition\":\"Database capturing assets with key attributes like ownership and financial value.\",\"image\":\"Asset_register.png\"},
+        {\"term\":\"Availability\",\"definition\":\"Ability of an IT service or item to perform its agreed function when required.\",\"image\":\"Availability.png\"},
+        {\"term\":\"Availability management practice\",\"definition\":\"Ensuring services meet agreed levels of availability for customers and users.\",\"image\":\"Availability_management_practice.png\"},
+        {\"term\":\"Baseline\",\"definition\":\"A report or metric serving as a starting point for progress assessment.\",\"image\":\"Baseline.png\"},
+        {\"term\":\"Best practice\",\"definition\":\"A proven successful method or way of working adopted by multiple organizations.\",\"image\":\"Best_practice.png\"},
+        {\"term\":\"Big data\",\"definition\":\"Utilizing large structured and unstructured data volumes to gain insights.\",\"image\":\"Big_data.png\"},
+        {\"term\":\"Business analysis practice\",\"definition\":\"Analyzing business elements to define needs, recommend solutions, and create stakeholder value.\",\"image\":\"Business_analysis_practice.png\"}
+    ];
 
-        const glossary = [];
-        const lines = rawData.trim().split('\n');
-        let currentEntry = {};
+    let currentQuestion = 0;
 
-        lines.forEach(line => {
-            const trimmedLine = line.trim();
-            if (trimmedLine.startsWith('Front:')) {
-                if (currentEntry.term && currentEntry.definition) {
-                    glossary.push(currentEntry);
-                }
-                currentEntry = { image: null }; // Reset and default image to null
-                currentEntry.term = trimmedLine.substring(6).split(',,,')[0].trim();
-            } else if (trimmedLine.startsWith('Back:')) {
-                let def = trimmedLine.substring(5).split(',,,')[0].trim();
-                def = def.replace(/^"|"$/g, '').replace(/\s+\d+$/, '').trim();
-                currentEntry.definition = def;
-            } else if (trimmedLine.startsWith('Image:')) {
-                const imgPart = trimmedLine.substring(6).split(',,,')[0].trim();
-                if (imgPart && imgPart.toLowerCase() !== 'nan') {
-                    currentEntry.image = imgPart;
-                }
-            }
-        });
+    function startQuiz() {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('quiz').classList.remove('hidden');
+        loadQuestion();
+    }
 
-        if (currentEntry.term && currentEntry.definition) {
-            glossary.push(currentEntry);
-        }
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question').innerText = q.term;
+        document.getElementById('definition').innerText = q.definition;
+        document.getElementById('questionImage').src = 'assets/images/' + q.image;
+    }
 
-        const cleanGlossary = glossary.filter(item => item.term && item.definition && item.definition.length > 10);
-
-
-        // --- UI ELEMENT REFERENCES ---
-        const loginPage = document.getElementById('login-page');
-        const quizPage = document.getElementById('quiz-page');
-        const loginBtn = document.getElementById('login-btn');
-        const questionCounter = document.getElementById('question-counter');
-        const scoreCounter = document.getElementById('score-counter');
-        const questionImage = document.getElementById('question-image');
-        const questionTerm = document.getElementById('question-term');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const nextBtn = document.getElementById('next-btn');
-        const resultsPage = document.getElementById('results-page');
-        const questionArea = document.getElementById('question-area');
-        const finalScore = document.getElementById('final-score');
-        const restartBtn = document.getElementById('restart-btn');
-
-        // --- QUIZ STATE ---
-        let shuffledGlossary = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        const totalQuestions = 10; // Let's do a 10-question quiz
-
-        // --- HELPER FUNCTIONS ---
-        function shuffleArray(array) {
-            return array.sort(() => Math.random() - 0.5);
-        }
-
-        // --- QUIZ LOGIC ---
-        function startQuiz() {
-            // Hide login, show quiz
-            loginPage.classList.add('hidden');
-            quizPage.classList.remove('hidden');
-            resultsPage.classList.add('hidden');
-            questionArea.classList.remove('hidden');
-
-            // Reset state
-            score = 0;
-            currentQuestionIndex = 0;
-            shuffledGlossary = shuffleArray([...cleanGlossary]).slice(0, totalQuestions);
-            
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
             loadQuestion();
+        } else {
+            alert('Quiz completed!');
+            currentQuestion = 0;
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('login').classList.remove('hidden');
         }
+    }
+</script>
 
-        function loadQuestion() {
-            // Clear previous state
-            optionsContainer.innerHTML = '';
-            feedbackMessage.textContent = '';
-            nextBtn.classList.add('hidden');
-
-            // Check if quiz is over
-            if (currentQuestionIndex >= shuffledGlossary.length) {
-                showResults();
-                return;
-            }
-
-            const currentQuestion = shuffledGlossary[currentQuestionIndex];
-
-            // Update UI
-            questionCounter.textContent = `Question ${currentQuestionIndex + 1}/${shuffledGlossary.length}`;
-            scoreCounter.textContent = `Score: ${score}`;
-            questionTerm.textContent = currentQuestion.term;
-            
-            // Set image or placeholder
-            if (currentQuestion.image) {
-                questionImage.src = currentQuestion.image;
-                questionImage.onerror = () => {
-                    questionImage.src = `https://placehold.co/600x400/e2e8f0/475569?text=Image+Not+Found`;
-                };
-            } else {
-                questionImage.src = `https://placehold.co/600x400/e2e8f0/475569?text=${currentQuestion.term.replace(/\s/g, '+')}`;
-            }
-
-            // Prepare answer options
-            const correctAnswer = currentQuestion.definition;
-            const distractors = cleanGlossary
-                .filter(item => item.definition !== correctAnswer) // Exclude correct answer
-                .sort(() => Math.random() - 0.5) // Shuffle to get random distractors
-                .slice(0, 3) // Get 3 distractors
-                .map(item => item.definition);
-
-            const options = shuffleArray([correctAnswer, ...distractors]);
-
-            // Create and display option buttons
-            options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option-btn w-full text-left p-4 border-2 border-gray-300 rounded-lg hover:bg-blue-100 hover:border-blue-400 focus:outline-none';
-                button.innerHTML = option;
-                button.onclick = () => selectAnswer(button, option, correctAnswer);
-                optionsContainer.appendChild(button);
-            });
-        }
-
-        function selectAnswer(selectedButton, selectedOption, correctOption) {
-            // Disable all buttons to prevent multiple answers
-            Array.from(optionsContainer.children).forEach(btn => {
-                btn.disabled = true;
-                // Reveal the correct answer
-                if (btn.innerHTML === correctOption) {
-                    btn.classList.add('correct');
-                }
-            });
-
-            if (selectedOption === correctOption) {
-                score++;
-                feedbackMessage.textContent = 'Correct!';
-                feedbackMessage.className = 'text-2xl font-bold mb-4 h-8 text-green-500';
-                selectedButton.classList.add('correct');
-            } else {
-                feedbackMessage.textContent = 'Incorrect!';
-                feedbackMessage.className = 'text-2xl font-bold mb-4 h-8 text-red-500';
-                selectedButton.classList.add('incorrect');
-            }
-            
-            scoreCounter.textContent = `Score: ${score}`;
-            nextBtn.classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
-        }
-
-        function showResults() {
-            questionArea.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            feedbackMessage.textContent = '';
-            resultsPage.classList.remove('hidden');
-            finalScore.textContent = `${score}/${shuffledGlossary.length}`;
-        }
-        
-        // --- EVENT LISTENERS ---
-        loginBtn.addEventListener('click', startQuiz);
-        nextBtn.addEventListener('click', nextQuestion);
-        restartBtn.addEventListener('click', startQuiz);
-
-    </script>
 </body>
 </html>
