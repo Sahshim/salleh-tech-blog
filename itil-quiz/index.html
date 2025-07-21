@@ -12,7 +12,7 @@
 <body class="bg-gray-100 font-sans">
 
 <!-- LOGIN SCREEN -->
-<div class="quiz-container" id="login-screen">
+<div class="quiz-container p-6 max-w-xl mx-auto" id="login-screen">
   <h2 class="text-2xl font-bold text-center mb-4">ITIL Quiz Login</h2>
   <input type="email" id="email" placeholder="Email" class="border rounded-md p-2 w-full mb-4" />
   <input type="password" id="password" placeholder="Password" class="border rounded-md p-2 w-full mb-4" />
@@ -21,25 +21,25 @@
 </div>
 
 <!-- START SCREEN -->
-<div class="quiz-container hidden" id="start-screen">
+<div class="quiz-container hidden p-6 max-w-xl mx-auto" id="start-screen">
   <h2 class="text-2xl font-bold mb-4">Welcome to the ITIL Adaptive Quiz</h2>
   <p class="mb-4">Test your knowledge and track your progress.</p>
   <button onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start Quiz</button>
 </div>
 
 <!-- QUIZ SECTION -->
-<div class="quiz-container hidden" id="quiz-section">
-  <div class="question-image text-center"><img src="" alt="concept" id="icon" class="max-h-40 mx-auto" /></div>
+<div class="quiz-container hidden p-6 max-w-3xl mx-auto" id="quiz-section">
+  <div class="question-image text-center mb-4"><img src="" alt="concept" id="icon" class="max-h-40 mx-auto" /></div>
   <h2 id="question" class="text-xl font-semibold mb-4">Loading...</h2>
   <div class="options grid grid-cols-1 gap-2 mb-4" id="options"></div>
   <div class="score text-sm text-gray-700 mb-2" id="score"></div>
   <div class="timer text-sm text-gray-600 mb-2" id="timer">Time: 00:00</div>
   <button onclick="nextQuestion()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Next Question</button>
-  <div class="chart-container mt-4">
+  <div class="chart-container mt-6">
     <canvas id="progressChart"></canvas>
-    <div class="pagination" id="chartPagination"></div>
+    <div class="pagination mt-2" id="chartPagination"></div>
     <label class="block mt-2"><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-    <div id="accordion"></div>
+    <div id="accordion" class="mt-4"></div>
   </div>
 </div>
 
@@ -92,7 +92,7 @@ function startQuiz() {
   score = 0; current = 0; seconds = 0;
   userProgress.length = 0;
   startTimer();
-  fetch('itil-quiz/itil_data_10_final.json')
+  fetch('./itil_data_10_final.json')
     .then(res => res.json())
     .then(allData => {
       const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -105,7 +105,7 @@ function startQuiz() {
         return {
           question: item.definition,
           correct_answer: item.term,
-          icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png',
+          icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon)}` : 'default.png',
           options: [...distractors, item.term].sort(() => 0.5 - Math.random())
         };
       });
