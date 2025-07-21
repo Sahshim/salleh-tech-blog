@@ -90,6 +90,31 @@ function startTimer() {
   }, 1000);
 }
 
+function loadQuestion() {
+  if (current >= quizData.length) return;
+  const q = quizData[current];
+  questionEl.textContent = q.question;
+  iconEl.src = q.icon;
+  optionsEl.innerHTML = '';
+
+  q.options.forEach(option => {
+    const btn = document.createElement('button');
+    btn.textContent = option;
+    btn.className = 'border rounded px-4 py-2 text-left bg-white hover:bg-gray-100';
+    btn.onclick = () => {
+      if (option === q.correct_answer) {
+        score++;
+        btn.classList.add('bg-green-200');
+      } else {
+        btn.classList.add('bg-red-200');
+      }
+      userProgress.push({ question: q.question, selected: option, correct: q.correct_answer });
+      scoreEl.textContent = `Score: ${score}/${quizData.length}`;
+    };
+    optionsEl.appendChild(btn);
+  });
+}
+
 function startQuiz() {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('quiz-section').style.display = 'block';
