@@ -76,8 +76,16 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
+const ADMIN_EMAIL = "salleh@gmail.com";
 
 function firebaseLogin() {
+  const email = document.getElementById('email').value;
+  if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    localStorage.setItem("isAdmin", "true");
+  } else {
+    localStorage.removeItem("isAdmin");
+  }
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
@@ -198,6 +206,21 @@ function nextQuestion() {
     drawChart();
     renderAnswerBreakdown();
     localStorage.setItem("progress_user", JSON.stringify(userProgress));
+
+    // Save session to Firestore
+    const user = auth.currentUser;
+    if (user) {
+      db.collection("quizResults").add({
+        uid: user.uid,
+        email: user.email,
+        timestamp: new Date(),
+        score: score,
+        total: quizData.length,
+        duration: seconds,
+        answers: userProgress
+      }).then(() => console.log("Quiz session saved.")).catch(err => console.error("Firestore error:", err));
+    }
+  }
   }
 }
 
