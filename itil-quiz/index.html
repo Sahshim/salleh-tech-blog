@@ -99,6 +99,7 @@ let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
 let questionEl, optionsEl, scoreEl, timerEl, iconEl;
 
 function startTimer() {
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     seconds++;
     const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -132,6 +133,20 @@ function loadQuestion() {
     };
     optionsEl.appendChild(btn);
   });
+}
+
+function nextQuestion() {
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    alert(`Quiz finished! Your score is ${score}/${quizData.length}`);
+    localStorage.setItem("progress_user", JSON.stringify(userProgress));
+    current = 0;
+    score = 0;
+    seconds = 0;
+    loadQuestion();
+  }
 }
 
 function startQuiz() {
