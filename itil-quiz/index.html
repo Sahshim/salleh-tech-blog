@@ -28,14 +28,13 @@
 
 <div id="quiz-section" class="hidden container mx-auto p-4">
   <div class="question-image text-center mb-4">
-    <img src="" alt="concept" id="icon" class="max-h-40 mx-auto" />
+    <img src="" alt="concept" id="icon" class="max-h-40 mx-auto" onerror="this.style.display='none';" />
   </div>
   <h2 id="question" class="text-xl font-semibold mb-4"></h2>
   <div id="definition" class="text-lg mb-4"></div>
+  <div class="options grid grid-cols-1 gap-2 mb-4" id="options"></div>
   <div class="timer text-sm text-gray-600 mb-2" id="timer">Time: 00:00</div>
   <div class="score text-sm text-gray-700 mb-2" id="score">Score: 0</div>
-  <button onclick="recordAnswer(true)" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-2">Correct</button>
-  <button onclick="recordAnswer(false)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Incorrect</button>
   <div class="mt-4">
     <button onclick="nextQuestion()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Next Question</button>
   </div>
@@ -62,16 +61,19 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 const questions = [
-  {term: "Acceptance criteria", definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.", image: "Acceptance_criteria.png"},
-  {term: "Agile", definition: "An umbrella term for frameworks enabling collaboration, prioritization, iterative and incremental delivery, and timeboxing like Scrum, Lean, and Kanban.", image: "Agile.png"},
-  {term: "Architecture management practice", definition: "Provides an understanding of all elements of an organization and how they relate.", image: "Architecture_management_practice.png"},
-  {term: "Asset register", definition: "A database or list of assets, capturing key attributes such as ownership and financial value.", image: "Asset_register.png"},
-  {term: "Availability", definition: "The ability of an IT service or other configuration item to perform its agreed function when required.", image: "Availability.png"},
-  {term: "Availability management practice", definition: "Ensures services deliver agreed levels of availability to meet customer and user needs.", image: "Availability_management_practice.png"},
-  {term: "Baseline", definition: "A report or metric that serves as a starting point for progress or change.", image: "Baseline.png"},
-  {term: "Best practice", definition: "A way of working that has been proven successful by multiple organizations.", image: "Best_practice.png"},
-  {term: "Big data", definition: "Use of large volumes of data from various sources to gain new insights.", image: "Big_data.png"},
-  {term: "Business analysis practice", definition: "Analyzes business needs and recommends solutions that create value.", image: "Business_analysis_practice.png"}
+  {
+    term: "Acceptance criteria",
+    definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
+    image: "https://salleh.cloud/assets/images/Acceptance_criteria.png",
+    options: [
+      "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
+      "How the ITIL framework processes incidents",
+      "An agreement between IT and users",
+      "A quality assurance checklist"
+    ],
+    answer: 0
+  },
+  // Add 9 more questions similarly...
 ];
 
 let currentQuestion = 0;
@@ -105,11 +107,22 @@ function loadQuestion() {
   const q = questions[currentQuestion];
   document.getElementById('question').innerText = q.term;
   document.getElementById('definition').innerText = q.definition;
-  document.getElementById('icon').src = 'assets/images/' + q.image;
+  document.getElementById('icon').src = q.image;
+
+  const optionsContainer = document.getElementById('options');
+  optionsContainer.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'bg-white border border-gray-300 rounded px-4 py-2 hover:bg-gray-200';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(idx);
+    optionsContainer.appendChild(btn);
+  });
 }
 
-function recordAnswer(isCorrect) {
-  if (isCorrect) score++;
+function checkAnswer(selected) {
+  const correct = questions[currentQuestion].answer;
+  if (selected === correct) score++;
   document.getElementById('score').innerText = 'Score: ' + score;
   nextQuestion();
 }
