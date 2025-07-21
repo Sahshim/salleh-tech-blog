@@ -128,6 +128,21 @@ function firebaseLogin() {
         })
         .catch(error => errorEl.textContent = error.message);
     });
+}
+
+  auth.signInWithEmailAndPassword(emailInput, password)
+    .then(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+    })
+    .catch(() => {
+      auth.createUserWithEmailAndPassword(emailInput, password)
+        .then(() => {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('start-screen').style.display = 'block';
+        })
+        .catch(error => errorEl.textContent = error.message);
+    });
 } else {
     localStorage.removeItem("isAdmin");
   }
