@@ -80,8 +80,8 @@ const db = firebase.firestore();
 const ADMIN_EMAIL = "salleh@gmail.com";
 
 function firebaseLogin() {
-  const email = document.getElementById('email').value;
-  if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+  const emailInput = document.getElementById('email').value;
+  if (emailInput.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     localStorage.setItem("isAdmin", "true");
   } else {
     localStorage.removeItem("isAdmin");
@@ -90,13 +90,13 @@ function firebaseLogin() {
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
 
-  auth.signInWithEmailAndPassword(email, password)
+  auth.signInWithEmailAndPassword(emailInput, password)
     .then(() => {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('start-screen').style.display = 'block';
     })
     .catch(() => {
-      auth.createUserWithEmailAndPassword(email, password)
+      auth.createUserWithEmailAndPassword(emailInput, password)
         .then(() => {
           document.getElementById('login-screen').style.display = 'none';
           document.getElementById('start-screen').style.display = 'block';
