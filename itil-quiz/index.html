@@ -92,7 +92,7 @@ function startQuiz() {
   score = 0; current = 0; seconds = 0;
   userProgress.length = 0;
   startTimer();
-  fetch('itil_data_10_final.json')
+  fetch('itil-quiz/itil_data_10_final.json')
     .then(res => res.json())
     .then(allData => {
       const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
