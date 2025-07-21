@@ -92,9 +92,16 @@ function startQuiz() {
   score = 0; current = 0; seconds = 0;
   userProgress.length = 0;
   startTimer();
+
+  console.log("Fetching quiz data...");
+
   fetch('/itil-quiz/itil_data_10_final.json')
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load JSON");
+      return res.json();
+    })
     .then(allData => {
+      console.log("Data loaded:", allData.length);
       const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
       quizData = selected.map(item => {
         const distractors = allData
@@ -102,14 +109,20 @@ function startQuiz() {
           .sort(() => 0.5 - Math.random())
           .slice(0, 3)
           .map(d => d.term);
+        const iconPath = item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png';
+        console.log(`Loading icon for ${item.term}:`, iconPath);
         return {
           question: item.definition,
           correct_answer: item.term,
-          icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png',
+          icon: iconPath,
           options: [...distractors, item.term].sort(() => 0.5 - Math.random())
         };
       });
       loadQuestion();
+    })
+    .catch(err => {
+      console.error("Error loading quiz data:", err);
+      questionEl.textContent = "Error loading quiz data.";
     });
 }
 </script>
