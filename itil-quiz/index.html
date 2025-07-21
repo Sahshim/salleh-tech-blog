@@ -81,6 +81,15 @@ const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
 let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
 let questionEl, optionsEl, scoreEl, timerEl, iconEl;
 
+function startTimer() {
+  timerInterval = setInterval(() => {
+    seconds++;
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `Time: ${mins}:${secs}`;
+  }, 1000);
+}
+
 function startQuiz() {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('quiz-section').style.display = 'block';
