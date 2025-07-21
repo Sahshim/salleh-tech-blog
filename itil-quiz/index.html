@@ -6,8 +6,7 @@
   <title>ITIL Adaptive Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  $1
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -81,44 +80,23 @@ const db = firebase.firestore();
 const ADMIN_EMAIL = "salleh@gmail.com";
 
 function firebaseLogin() {
-  const emailInput = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const errorEl = document.getElementById('login-error');
-
-  // Admin check
-  if (emailInput.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+  const email = document.getElementById('email').value;
+  if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     localStorage.setItem("isAdmin", "true");
   } else {
-    localStorage.removeItem("isAdmin");
-  }
-
-  auth.signInWithEmailAndPassword(emailInput, password)
-    .then(() => {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('start-screen').style.display = 'block';
-    })
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
-        .then(() => {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('start-screen').style.display = 'block';
-        })
-        .catch(error => errorEl.textContent = error.message);
-    });
-} else {
     localStorage.removeItem("isAdmin");
   }
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
 
-  auth.signInWithEmailAndPassword(emailInput, password)
+  auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('start-screen').style.display = 'block';
     })
     .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
+      auth.createUserWithEmailAndPassword(email, password)
         .then(() => {
           document.getElementById('login-screen').style.display = 'none';
           document.getElementById('start-screen').style.display = 'block';
