@@ -32,6 +32,7 @@
   </div>
   <h2 id="definition" class="text-xl font-semibold mb-4"></h2>
   <div class="options grid grid-cols-1 gap-2 mb-4" id="options"></div>
+  <div class="text-sm text-gray-600 mb-2" id="feedback"></div>
   <div class="timer text-sm text-gray-600 mb-2" id="timer">Time: 00:00</div>
   <div class="score text-sm text-gray-700 mb-2" id="score">Score: 0</div>
   <div class="mt-4">
@@ -60,30 +61,16 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 const questions = [
-  {
-    definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
-    options: ["Acceptance criteria", "Incident handling", "Service Level Agreement", "Quality checklist"],
-    answer: 0,
-    image: "images/acceptance_criteria.png"
-  },
-  {
-    definition: "A set of detailed instructions to restore a service or component after an incident.",
-    options: ["Backup policy", "Change record", "Incident handling", "Release note"],
-    answer: 2,
-    image: "images/incident_handling.png"
-  },
-  {
-    definition: "A documented agreement between a service provider and a customer that identifies services and service targets.",
-    options: ["IT policy", "Service Level Agreement", "Warranty document", "Maintenance guide"],
-    answer: 1,
-    image: "images/sla.png"
-  },
-  {
-    definition: "A checklist of standards and best practices used to review the quality of services or processes.",
-    options: ["Change log", "Compliance tracker", "Quality checklist", "Audit plan"],
-    answer: 2,
-    image: "images/quality_checklist.png"
-  }
+  { term: "Agile", definition: "An umbrella term for a collection of frameworks and techniques that together enable teams and individuals to work in a way that is typified by collaboration, prioritization, iterative and incremental delivery, and timeboxing...", answer: 0, options: ["Agile", "Waterfall", "Lean", "DevOps"], image: "assets/images/Agile.png" },
+  { term: "Architecture management practice", definition: "The practice of providing an understanding of all the different elements that make up an organization and how those elements relate to one another.", answer: 0, options: ["Architecture management practice", "Portfolio mgmt", "Service design", "Governance"], image: "assets/images/Architecture management practice.png" },
+  { term: "Asset register", definition: "A database or list of assets, capturing key attributes such as ownership and financial value.", answer: 0, options: ["Asset register", "Configuration mgmt", "CMDB", "Asset catalog"], image: "assets/images/Asset register.png" },
+  { term: "Availability", definition: "The ability of an IT service or other configuration item to perform its agreed function when required.", answer: 0, options: ["Availability", "Capacity", "Reliability", "Continuity"], image: "assets/images/Availability.png" },
+  { term: "Availability management practice", definition: "The practice of ensuring that services deliver agreed levels of availability to meet the needs of customers and users.", answer: 0, options: ["Availability management practice", "Incident mgmt", "Problem mgmt", "Monitoring"], image: "assets/images/Availability management practice.png" },
+  { term: "Baseline", definition: "A report or metric that serves as a starting point against which progress or change can be assessed.", answer: 0, options: ["Baseline", "KPI", "Metric", "SLA"], image: "assets/images/Baseline.png" },
+  { term: "Best practice", definition: "A way of working that has been proven to be successful by multiple organizations.", answer: 0, options: ["Best practice", "Guideline", "Standard", "Process"], image: "assets/images/Best practice.png" },
+  { term: "Big data", definition: "The use of very large volumes of structured and unstructured data from a variety of sources to gain new insights.", answer: 0, options: ["Big data", "Analytics", "Data lake", "Reporting"], image: "assets/images/Big data.png" },
+  { term: "Business analysis practice", definition: "The practice of analysing a business or some element of a business, defining its needs and recommending solutions to address these needs and/or solve a business problem, and create value for stakeholders.", answer: 0, options: ["Business analysis practice", "Requirements analysis", "UX design", "IT strategy"], image: "assets/images/Business analysis practice.png" },
+  { term: "Business case", definition: "A justification for expenditure of organizational resources, providing information about costs, benefits, options, risks, and issues.", answer: 0, options: ["Business case", "ROI analysis", "Cost-benefit report", "Feasibility study"], image: "assets/images/Business case.png" }
 ];
 
 let currentQuestion = 0;
@@ -118,7 +105,9 @@ function startQuiz() {
   loadQuestion();
   startTimer();
   score = 0;
+  seconds = 0;
   document.getElementById('score').innerText = 'Score: 0';
+  document.getElementById('timer').innerText = 'Time: 00:00';
 }
 
 function loadQuestion() {
@@ -126,8 +115,9 @@ function loadQuestion() {
   answered = false;
   document.getElementById('nextBtn').disabled = true;
   document.getElementById('definition').innerText = q.definition;
-  document.getElementById('icon').src = q.image;
+  document.getElementById('icon').src = q.image || `assets/images/${q.term}.png`;
   document.getElementById('icon').style.display = 'block';
+  document.getElementById('feedback').innerText = '';
 
   const optionsContainer = document.getElementById('options');
   optionsContainer.innerHTML = '';
@@ -150,6 +140,7 @@ function checkAnswer(selected, btn) {
     if (i === correct) b.classList.add('bg-green-200');
     else if (i === selected) b.classList.add('bg-red-200');
   });
+  document.getElementById('feedback').innerText = selected === correct ? "✅ Correct!" : `❌ Incorrect. Correct answer: ${questions[currentQuestion].options[correct]}`;
   if (selected === correct) score++;
   document.getElementById('score').innerText = 'Score: ' + score;
   document.getElementById('nextBtn').disabled = false;
