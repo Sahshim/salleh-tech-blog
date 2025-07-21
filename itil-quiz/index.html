@@ -105,7 +105,7 @@ function startQuiz() {
         return {
           question: item.definition,
           correct_answer: item.term,
-          icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon)}` : 'default.png',
+          icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png',
           options: [...distractors, item.term].sort(() => 0.5 - Math.random())
         };
       });
