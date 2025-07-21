@@ -100,28 +100,6 @@ function firebaseLogin() {
     localStorage.removeItem("isAdmin");
   }
 
-  )
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
-        .then(() => {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('start-screen').style.display = 'block';
-        })
-        .catch(error => errorEl.textContent = error.message);
-    });
-}
-
-  )
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
-        .then(() => {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('start-screen').style.display = 'block';
-        })
-        .catch(error => errorEl.textContent = error.message);
-    });
-}
-
   auth.signInWithEmailAndPassword(emailInput, password)
     .then(() => {
       document.getElementById('login-screen').style.display = 'none';
@@ -136,75 +114,6 @@ function firebaseLogin() {
         .catch(error => errorEl.textContent = error.message);
     });
 }
-
-  auth.signInWithEmailAndPassword(emailInput, password)
-    .then(() => {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('start-screen').style.display = 'block';
-    })
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
-        .then(() => {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('start-screen').style.display = 'block';
-        })
-        .catch(error => errorEl.textContent = error.message);
-    });
-} )
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(emailInput, password)
-        .then(() => {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('start-screen').style.display = 'block';
-        })
-        .catch(error => errorEl.textContent = error.message);
-    });
-}
-
-function showFeedbackModal(text) {
-  document.getElementById('feedbackText').textContent = text;
-  document.getElementById('feedbackModal').classList.remove('hidden');
-}
-
-function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
-}
-
-const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
-let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
-let questionEl, optionsEl, scoreEl, timerEl, iconEl;
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    seconds++;
-    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    timerEl.textContent = `Time: ${mins}:${secs}`;
-  }, 1000);
-}
-
-function drawChart() {
-  const ctx = document.getElementById('progressChart').getContext('2d');
-  const filterIncorrect = document.getElementById('filterIncorrect').checked;
-  const labels = userProgress.map((entry, i) => `Q${i + 1}`);
-  const data = userProgress.map(entry => filterIncorrect ? (entry.selected !== entry.correct ? 0 : null) : (entry.selected === entry.correct ? 1 : 0));
-  if (window.myChart) window.myChart.destroy();
-  window.myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Correct Answers',
-        data: data,
-        backgroundColor: '#4ade80'
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true, max: 1 }
-      }
     }
   });
 }
