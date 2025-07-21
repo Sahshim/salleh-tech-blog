@@ -59,7 +59,33 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-const questions = [...]; // kept unchanged
+const questions = [
+  {
+    definition: "A list of minimum requirements that a service or service component must meet for it to be acceptable to key stakeholders.",
+    options: ["Acceptance criteria", "Incident handling", "Service Level Agreement", "Quality checklist"],
+    answer: 0,
+    image: "images/acceptance_criteria.png"
+  },
+  {
+    definition: "A set of detailed instructions to restore a service or component after an incident.",
+    options: ["Backup policy", "Change record", "Incident handling", "Release note"],
+    answer: 2,
+    image: "images/incident_handling.png"
+  },
+  {
+    definition: "A documented agreement between a service provider and a customer that identifies services and service targets.",
+    options: ["IT policy", "Service Level Agreement", "Warranty document", "Maintenance guide"],
+    answer: 1,
+    image: "images/sla.png"
+  },
+  {
+    definition: "A checklist of standards and best practices used to review the quality of services or processes.",
+    options: ["Change log", "Compliance tracker", "Quality checklist", "Audit plan"],
+    answer: 2,
+    image: "images/quality_checklist.png"
+  }
+  // Add more question objects in this format
+];
 
 let currentQuestion = 0;
 let timerInterval;
@@ -77,7 +103,14 @@ function firebaseLogin() {
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('start-screen').classList.remove('hidden');
     })
-    .catch(error => errorEl.textContent = error.message);
+    .catch(() => {
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('start-screen').classList.remove('hidden');
+        })
+        .catch(error => errorEl.textContent = error.message);
+    });
 }
 
 function startQuiz() {
