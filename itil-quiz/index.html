@@ -42,9 +42,7 @@
   <h2 class="text-2xl font-bold mb-4">Quiz Results</h2>
   <canvas id="progressChart"></canvas>
   <label class="block mt-4"><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-  <div id="accordion" class="mt-4"></div>
 
-  <!-- Recommendation Section -->
   <div class="mt-6">
     <h3 class="text-xl font-semibold mb-4">Recommended Topics to Review</h3>
     <div id="recommendation-list" class="space-y-2"></div>
@@ -68,8 +66,7 @@ const firebaseConfig = {
   projectId: "itilmcq",
   storageBucket: "itilmcq.appspot.com",
   messagingSenderId: "535085938419",
-  appId: "1:535085938419:web:8549b9b3d11dd26a756986",
-  measurementId: "G-PW7SPRRLVW"
+  appId: "1:535085938419:web:8549b9b3d11dd26a756986"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -78,7 +75,6 @@ function firebaseLogin() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
-
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       document.getElementById('login-screen').style.display = 'none';
@@ -94,15 +90,7 @@ function firebaseLogin() {
     });
 }
 
-function showFeedbackModal(text) {
-  document.getElementById('feedbackText').textContent = text;
-  document.getElementById('feedbackModal').classList.remove('hidden');
-}
-function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
-}
-
-const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
+const userProgress = [], glossary = {};
 let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
 let questionEl, optionsEl, scoreEl, timerEl, iconEl;
 
@@ -116,6 +104,14 @@ function startTimer() {
   }, 1000);
 }
 
+function showFeedbackModal(text) {
+  document.getElementById('feedbackText').textContent = text;
+  document.getElementById('feedbackModal').classList.remove('hidden');
+}
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.add('hidden');
+}
+
 function drawChart() {
   const ctx = document.getElementById('progressChart').getContext('2d');
   const filterIncorrect = document.getElementById('filterIncorrect').checked;
@@ -124,18 +120,8 @@ function drawChart() {
   if (window.myChart) window.myChart.destroy();
   window.myChart = new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Correct Answers',
-        data: data,
-        backgroundColor: '#4ade80'
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true, max: 1 } }
-    }
+    data: { labels, datasets: [{ label: 'Correct Answers', data, backgroundColor: '#4ade80' }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true, max: 1 } } }
   });
 }
 
@@ -166,8 +152,24 @@ function loadQuestion() {
 }
 
 function getRecommendations(progress) {
-  const incorrect = progress.filter(p => p.selected !== p.correct);
-  return [...new Set(incorrect.map(p => p.correct))];
+  return [...new Set(progress.filter(p => p.selected !== p.correct).map(p => p.correct))];
+}
+
+function displayRecommendations(terms) {
+  const container = document.getElementById('recommendation-list');
+  container.innerHTML = '';
+  terms.forEach(term => {
+    const def = glossary[term] || "No definition found.";
+    const wrapper = document.createElement('div');
+    wrapper.className = "border rounded shadow";
+
+    wrapper.innerHTML = `
+      <button class="w-full text-left px-4 py-2 font-semibold bg-gray-100 hover:bg-gray-200" onclick="this.nextElementSibling.classList.toggle('hidden')">
+        ${term}
+      </button>
+      <div class="px-4 py-2 hidden text-sm text-gray-700">${def}</div>`;
+    container.appendChild(wrapper);
+  });
 }
 
 function nextQuestion() {
@@ -179,22 +181,7 @@ function nextQuestion() {
     document.getElementById('quiz-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'block';
     drawChart();
-
-    const recs = getRecommendations(userProgress);
-    const recList = document.getElementById('recommendation-list');
-    recList.innerHTML = recs.map(term => {
-      return `
-        <div class="border rounded shadow">
-          <button class="w-full text-left px-4 py-2 font-semibold bg-gray-100 hover:bg-gray-200 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
-            ${term}
-          </button>
-          <div class="px-4 py-2 hidden">
-            <p class="text-sm text-gray-700">Explanation for <strong>${term}</strong> will appear here.</p>
-          </div>
-        </div>`;
-    }).join('');
-
-    localStorage.setItem("progress_user", JSON.stringify(userProgress));
+    displayRecommendations(getRecommendations(userProgress));
   }
 }
 
@@ -210,30 +197,33 @@ function startQuiz() {
   userProgress.length = 0;
   startTimer();
 
-  fetch('/itil-quiz/itil_data_10_final.json')
-    .then(res => res.json())
-    .then(allData => {
-      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
-      quizData = selected.map(item => {
-        const distractors = allData
-          .filter(d => d.term !== item.term)
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3)
-          .map(d => d.term);
-        const iconPath = item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png';
-        return {
-          question: item.definition,
-          correct_answer: item.term,
-          icon: iconPath,
-          options: [...distractors, item.term].sort(() => 0.5 - Math.random())
-        };
-      });
-      loadQuestion();
-    })
-    .catch(err => {
-      questionEl.textContent = "Error loading quiz data.";
-      console.error("Error loading quiz data:", err);
+  Promise.all([
+    fetch('/itil-quiz/itil_data_10_final_with_difficulty.json').then(res => res.json())
+  ]).then(([allData]) => {
+    // Load glossary
+    allData.forEach(entry => glossary[entry.term] = entry.definition);
+
+    // Pick random 10 questions
+    const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
+    quizData = selected.map(item => {
+      const distractors = allData
+        .filter(d => d.term !== item.term)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3)
+        .map(d => d.term);
+      const iconPath = item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png';
+      return {
+        question: item.definition,
+        correct_answer: item.term,
+        icon: iconPath,
+        options: [...distractors, item.term].sort(() => 0.5 - Math.random())
+      };
     });
+    loadQuestion();
+  }).catch(err => {
+    questionEl.textContent = "Error loading quiz data.";
+    console.error("Error loading quiz data:", err);
+  });
 }
 </script>
 </body>
