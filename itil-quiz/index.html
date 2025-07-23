@@ -4,12 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ITIL Adaptive Quiz</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">function restartQuiz() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+  score = 0;
+  current = 0;
+  seconds = 0;
+  userProgress.length = 0;
+  localStorage.setItem("progress_user", JSON.stringify(userProgress));
+}
+function firebaseLogout() {
+  auth.signOut().then(() => {
+    localStorage.removeItem("progress_user");
+    showLogout(false);
+    location.reload();
+  }).catch((error) => {
+    console.error('Logout error:', error);
+  });
+}
+
+function showLogout(show) {
+  const btn = document.getElementById("logout-btn");
+  if (btn) btn.classList.toggle("hidden", !show);
+}
+</script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  $1
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
+  <button id="logout-btn" onclick="firebaseLogout()" class="hidden fixed top-4 right-4 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded z-50">Logout</button>
   <button onclick="firebaseLogout()" class="fixed top-4 right-4 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded z-50">Logout</button>
 
 <!-- LOGIN SCREEN -->
@@ -52,7 +77,7 @@
     <ul id="answer-breakdown" class="space-y-3"></ul>
   </div>
 
-  <button onclick="location.reload()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
+  <button onclick="restartQuiz()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
 </div>
 
 <!-- FEEDBACK MODAL -->
@@ -76,19 +101,28 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
+const ADMIN_EMAIL = "salleh@gmail.com";
 
 function firebaseLogin() {
-  const email = document.getElementById('email').value;
+  const emailInput = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('login-error');
 
-  auth.signInWithEmailAndPassword(email, password)
+  if (emailInput.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    localStorage.setItem("isAdmin", "true");
+  } else {
+    localStorage.removeItem("isAdmin");
+  }
+
+  auth.signInWithEmailAndPassword(emailInput, password)
     .then(() => {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('start-screen').style.display = 'block';
+      showLogout(true);
     })
     .catch(() => {
-      auth.createUserWithEmailAndPassword(email, password)
+      auth.createUserWithEmailAndPassword(emailInput, password)
         .then(() => {
           document.getElementById('login-screen').style.display = 'none';
           document.getElementById('start-screen').style.display = 'block';
@@ -96,51 +130,6 @@ function firebaseLogin() {
         .catch(error => errorEl.textContent = error.message);
     });
 }
-
-function showFeedbackModal(text) {
-  document.getElementById('feedbackText').textContent = text;
-  document.getElementById('feedbackModal').classList.remove('hidden');
-}
-
-function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
-}
-
-const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
-let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
-let questionEl, optionsEl, scoreEl, timerEl, iconEl;
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    seconds++;
-    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    timerEl.textContent = `Time: ${mins}:${secs}`;
-  }, 1000);
-}
-
-function drawChart() {
-  const ctx = document.getElementById('progressChart').getContext('2d');
-  const filterIncorrect = document.getElementById('filterIncorrect').checked;
-  const labels = userProgress.map((entry, i) => `Q${i + 1}`);
-  const data = userProgress.map(entry => filterIncorrect ? (entry.selected !== entry.correct ? 0 : null) : (entry.selected === entry.correct ? 1 : 0));
-  if (window.myChart) window.myChart.destroy();
-  window.myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Correct Answers',
-        data: data,
-        backgroundColor: '#4ade80'
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true, max: 1 }
-      }
     }
   });
 }
@@ -198,12 +187,28 @@ function nextQuestion() {
     drawChart();
     renderAnswerBreakdown();
     localStorage.setItem("progress_user", JSON.stringify(userProgress));
+
+    // Save session to Firestore
+    const user = auth.currentUser;
+    if (user) {
+      db.collection("quizResults").add({
+        uid: user.uid,
+        email: user.email,
+        timestamp: new Date(),
+        score: score,
+        total: quizData.length,
+        duration: seconds,
+        answers: userProgress
+      }).then(() => console.log("Quiz session saved.")).catch(err => console.error("Firestore error:", err));
+    }
+  }
   }
 }
 
 function startQuiz() {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('quiz-section').style.display = 'block';
+  showLogout(true);
   questionEl = document.getElementById('question');
   optionsEl = document.getElementById('options');
   scoreEl = document.getElementById('score');
