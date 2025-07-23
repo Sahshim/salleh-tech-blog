@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -26,7 +25,6 @@
   <h2 class="text-2xl font-bold mb-4">Welcome to the ITIL Adaptive Quiz</h2>
   <p class="mb-4">Test your knowledge and track your progress.</p>
   <button onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start Quiz</button>
-  <button onclick="restartQuiz()" class="mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
 </div>
 
 <!-- QUIZ SECTION -->
@@ -43,17 +41,12 @@
 <div class="quiz-container hidden p-6 max-w-3xl mx-auto" id="results-section">
   <h2 class="text-2xl font-bold mb-4">Quiz Results</h2>
   <canvas id="progressChart"></canvas>
-  <div class="pagination mt-2" id="chartPagination"></div>
   <label class="block mt-4"><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-  <div id="accordion" class="mt-4"></div>
-
-  <!-- RECOMMENDED TOPICS -->
   <div class="mt-6">
     <h3 class="text-xl font-semibold mb-4">Recommended Topics to Review</h3>
     <ul id="recommendation-list" class="list-disc list-inside text-gray-700"></ul>
   </div>
-
-  <button onclick="restartQuiz()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
+  <button onclick="location.reload()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
 </div>
 
 <!-- FEEDBACK MODAL -->
@@ -74,10 +67,8 @@ const firebaseConfig = {
   appId: "1:535085938419:web:8549b9b3d11dd26a756986",
   measurementId: "G-PW7SPRRLVW"
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
 
 function firebaseLogin() {
   const email = document.getElementById('email').value;
@@ -98,7 +89,145 @@ function firebaseLogin() {
         .catch(error => errorEl.textContent = error.message);
     });
 }
-</script>
 
+const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
+let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
+let questionEl, optionsEl, scoreEl, timerEl, iconEl;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    seconds++;
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `Time: ${mins}:${secs}`;
+  }, 1000);
+}
+
+function showFeedbackModal(text) {
+  document.getElementById('feedbackText').textContent = text;
+  document.getElementById('feedbackModal').classList.remove('hidden');
+}
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.add('hidden');
+}
+
+function getRecommendations(progress) {
+  const incorrect = progress.filter(p => p.selected !== p.correct);
+  const terms = [...new Set(incorrect.map(p => p.correct))];
+  return terms.slice(0, 5);
+}
+
+function drawChart() {
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  const filterIncorrect = document.getElementById('filterIncorrect').checked;
+  const labels = userProgress.map((entry, i) => `Q${i + 1}`);
+  const data = userProgress.map(entry =>
+    filterIncorrect ? (entry.selected !== entry.correct ? 0 : null) : (entry.selected === entry.correct ? 1 : 0)
+  );
+  if (window.myChart) window.myChart.destroy();
+  window.myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Correct Answers',
+        data: data,
+        backgroundColor: '#4ade80'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, max: 1 }
+      }
+    }
+  });
+}
+
+function loadQuestion() {
+  if (current >= quizData.length) return;
+  const q = quizData[current];
+  questionEl.textContent = q.question;
+  iconEl.src = q.icon;
+  optionsEl.innerHTML = '';
+
+  q.options.forEach(option => {
+    const btn = document.createElement('button');
+    btn.textContent = option;
+    btn.className = 'border rounded px-4 py-2 text-left bg-white hover:bg-gray-100';
+    btn.onclick = () => {
+      if (option === q.correct_answer) {
+        score++;
+        btn.classList.add('bg-green-200');
+        showFeedbackModal("Correct! 🎉");
+      } else {
+        btn.classList.add('bg-red-200');
+        showFeedbackModal(`Incorrect. Correct answer: ${q.correct_answer}`);
+      }
+      userProgress.push({ question: q.question, selected: option, correct: q.correct_answer });
+      scoreEl.textContent = `Score: ${score}/${quizData.length}`;
+    };
+    optionsEl.appendChild(btn);
+  });
+}
+
+function nextQuestion() {
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    clearInterval(timerInterval);
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('results-section').style.display = 'block';
+    drawChart();
+    const recs = getRecommendations(userProgress);
+    const recList = document.getElementById('recommendation-list');
+    recList.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+    localStorage.setItem("progress_user", JSON.stringify(userProgress));
+  }
+}
+
+function startQuiz() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-section').style.display = 'block';
+  questionEl = document.getElementById('question');
+  optionsEl = document.getElementById('options');
+  scoreEl = document.getElementById('score');
+  timerEl = document.getElementById('timer');
+  iconEl = document.getElementById('icon');
+  score = 0; current = 0; seconds = 0;
+  userProgress.length = 0;
+  startTimer();
+
+  fetch('/itil-quiz/itil_data_10_final.json')
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load JSON");
+      return res.json();
+    })
+    .then(allData => {
+      const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
+      quizData = selected.map(item => {
+        const distractors = allData
+          .filter(d => d.term !== item.term)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+          .map(d => d.term);
+        const iconPath = item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png';
+        return {
+          question: item.definition,
+          correct_answer: item.term,
+          icon: iconPath,
+          options: [...distractors, item.term].sort(() => 0.5 - Math.random())
+        };
+      });
+      loadQuestion();
+    })
+    .catch(err => {
+      questionEl.textContent = "Error loading quiz data.";
+      console.error("Error loading quiz data:", err);
+    });
+}
+</script>
 </body>
 </html>
