@@ -42,10 +42,14 @@
   <h2 class="text-2xl font-bold mb-4">Quiz Results</h2>
   <canvas id="progressChart"></canvas>
   <label class="block mt-4"><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
+  <div id="accordion" class="mt-4"></div>
+
+  <!-- Recommendation Section -->
   <div class="mt-6">
     <h3 class="text-xl font-semibold mb-4">Recommended Topics to Review</h3>
-    <ul id="recommendation-list" class="list-disc list-inside text-gray-700"></ul>
+    <div id="recommendation-list" class="space-y-2"></div>
   </div>
+
   <button onclick="location.reload()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
 </div>
 
@@ -90,6 +94,14 @@ function firebaseLogin() {
     });
 }
 
+function showFeedbackModal(text) {
+  document.getElementById('feedbackText').textContent = text;
+  document.getElementById('feedbackModal').classList.remove('hidden');
+}
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.add('hidden');
+}
+
 const userProgress = JSON.parse(localStorage.getItem("progress_user")) || [];
 let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
 let questionEl, optionsEl, scoreEl, timerEl, iconEl;
@@ -104,27 +116,11 @@ function startTimer() {
   }, 1000);
 }
 
-function showFeedbackModal(text) {
-  document.getElementById('feedbackText').textContent = text;
-  document.getElementById('feedbackModal').classList.remove('hidden');
-}
-function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
-}
-
-function getRecommendations(progress) {
-  const incorrect = progress.filter(p => p.selected !== p.correct);
-  const terms = [...new Set(incorrect.map(p => p.correct))];
-  return terms.slice(0, 5);
-}
-
 function drawChart() {
   const ctx = document.getElementById('progressChart').getContext('2d');
   const filterIncorrect = document.getElementById('filterIncorrect').checked;
   const labels = userProgress.map((entry, i) => `Q${i + 1}`);
-  const data = userProgress.map(entry =>
-    filterIncorrect ? (entry.selected !== entry.correct ? 0 : null) : (entry.selected === entry.correct ? 1 : 0)
-  );
+  const data = userProgress.map(entry => filterIncorrect ? (entry.selected !== entry.correct ? 0 : null) : (entry.selected === entry.correct ? 1 : 0));
   if (window.myChart) window.myChart.destroy();
   window.myChart = new Chart(ctx, {
     type: 'bar',
@@ -138,9 +134,7 @@ function drawChart() {
     },
     options: {
       responsive: true,
-      scales: {
-        y: { beginAtZero: true, max: 1 }
-      }
+      scales: { y: { beginAtZero: true, max: 1 } }
     }
   });
 }
@@ -151,7 +145,6 @@ function loadQuestion() {
   questionEl.textContent = q.question;
   iconEl.src = q.icon;
   optionsEl.innerHTML = '';
-
   q.options.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
@@ -172,6 +165,11 @@ function loadQuestion() {
   });
 }
 
+function getRecommendations(progress) {
+  const incorrect = progress.filter(p => p.selected !== p.correct);
+  return [...new Set(incorrect.map(p => p.correct))];
+}
+
 function nextQuestion() {
   current++;
   if (current < quizData.length) {
@@ -181,9 +179,21 @@ function nextQuestion() {
     document.getElementById('quiz-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'block';
     drawChart();
+
     const recs = getRecommendations(userProgress);
     const recList = document.getElementById('recommendation-list');
-    recList.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+    recList.innerHTML = recs.map(term => {
+      return `
+        <div class="border rounded shadow">
+          <button class="w-full text-left px-4 py-2 font-semibold bg-gray-100 hover:bg-gray-200 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
+            ${term}
+          </button>
+          <div class="px-4 py-2 hidden">
+            <p class="text-sm text-gray-700">Explanation for <strong>${term}</strong> will appear here.</p>
+          </div>
+        </div>`;
+    }).join('');
+
     localStorage.setItem("progress_user", JSON.stringify(userProgress));
   }
 }
@@ -201,10 +211,7 @@ function startQuiz() {
   startTimer();
 
   fetch('/itil-quiz/itil_data_10_final.json')
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to load JSON");
-      return res.json();
-    })
+    .then(res => res.json())
     .then(allData => {
       const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
       quizData = selected.map(item => {
