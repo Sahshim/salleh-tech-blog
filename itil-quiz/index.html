@@ -4,220 +4,258 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ITIL Adaptive Quiz</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
-    .quiz-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    input, button { padding: 0.5rem; margin-top: 0.5rem; width: 100%; max-width: 300px; }
-    .question-image img { max-width: 150px; }
-    .options button { margin: 0.5rem 0; width: 100%; }
-    .options button:hover { background: #e0e0e0; }
-    .disabled { pointer-events: none; opacity: 0.6; }
-    .chart-container { margin-top: 2rem; }
-    canvas { width: 100% !important; height: auto !important; }
-    .accordion-item { background: #f9f9f9; margin: 0.5rem 0; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-    .accordion-content { display: none; margin-top: 0.5rem; }
-  </style>
-</head>
-<body>
+  <script src="https://cdn.tailwindcss.com">function restartQuiz() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+  score = 0;
+  current = 0;
+  seconds = 0;
+  userProgress.length = 0;
+  localStorage.setItem("progress_user", JSON.stringify(userProgress));
+}
+function firebaseLogout() {
+  auth.signOut().then(() => {
+    localStorage.removeItem("progress_user");
+    showLogout(false);
+    location.reload();
+  }).catch((error) => {
+    console.error('Logout error:', error);
+  });
+}
 
-  <!-- LOGIN SCREEN -->
-  <div class="quiz-container" id="login-screen">
-    <h2>ITIL Quiz Login</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <p id="login-error" style="color:red;"></p>
-  </div>
-
-  <!-- START SCREEN -->
-  <div class="quiz-container" id="start-screen" style="display:none;">
-    <h2>Welcome to the ITIL Adaptive Quiz</h2>
-    <p>Test your knowledge and track your progress.</p>
-    <button onclick="startQuiz()">Start Quiz</button>
-  </div>
-
-  <!-- QUIZ SECTION -->
-  <div class="quiz-container" id="quiz-section" style="display: none;">
-    <div class="question-image"><img src="" alt="concept" id="icon" /></div>
-    <h2 id="question">Loading...</h2>
-    <div class="options" id="options"></div>
-    <div class="score" id="score"></div>
-    <div class="timer" id="timer">Time: 00:00</div>
-    <button onclick="nextQuestion()">Next Question</button>
-    <div class="chart-container">
-      <canvas id="progressChart"></canvas>
-      <div class="pagination" id="chartPagination"></div>
-      <label><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
-      <div id="accordion"></div>
-    </div>
-  </div>
-
+function showLogout(show) {
+  const btn = document.getElementById("logout-btn");
+  if (btn) btn.classList.toggle("hidden", !show);
+}
+</script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  $1
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const ADMIN_USER = "Salleh";
-    const ADMIN_PASS = "sa7144";
-    const currentUser = ADMIN_USER;
-    const userProgress = JSON.parse(localStorage.getItem(`progress_${currentUser}`)) || [];
-    let quizData = [], current = 0, score = 0, seconds = 0, timerInterval;
-    let questionEl, optionsEl, scoreEl, timerEl, iconEl;
+</head>
+<body class="bg-gray-100 font-sans">
+  
+  
 
-    fetch('itil_data_10_final.json')
-      .then(res => res.json())
-      .then(allData => {
-        const selected = allData.sort(() => 0.5 - Math.random()).slice(0, 10);
-        quizData = selected.map(item => {
-          const distractors = allData
-            .filter(d => d.term !== item.term)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3)
-            .map(d => d.term);
-          return {
-            question: item.definition,
-            correct_answer: item.term,
-            icon: item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png',
-            options: [...distractors, item.term].sort(() => 0.5 - Math.random())
-          };
-        });
-      });
+<!-- LOGIN SCREEN -->
+<div class="quiz-container p-6 max-w-xl mx-auto" id="login-screen">
+  <h2 class="text-2xl font-bold text-center mb-4">ITIL Quiz Login</h2>
+  <input type="email" id="email" placeholder="Email" class="border rounded-md p-2 w-full mb-4" />
+  <input type="password" id="password" placeholder="Password" class="border rounded-md p-2 w-full mb-4" />
+  <button onclick="firebaseLogin()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">Login / Register</button>
+  <p id="login-error" class="text-red-500 mt-2"></p>
 
-    function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-      const errorMsg = document.getElementById('login-error');
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('start-screen').style.display = 'block';
-      } else {
-        errorMsg.textContent = '❌ Invalid username or password.';
-      }
+</div>
+<!-- START SCREEN -->
+$1
+  <button onclick="restartQuiz()" class="mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
+</div>
+
+<!-- QUIZ SECTION -->
+<div class="quiz-container hidden p-6 max-w-3xl mx-auto" id="quiz-section">
+  <div class="question-image text-center mb-4"><img src="" alt="concept" id="icon" class="max-h-40 mx-auto" /></div>
+  <h2 id="question" class="text-xl font-semibold mb-4">Loading...</h2>
+  <div class="options grid grid-cols-1 gap-2 mb-4" id="options"></div>
+  <div class="score text-sm text-gray-700 mb-2" id="score"></div>
+  <div class="timer text-sm text-gray-600 mb-2" id="timer">Time: 00:00</div>
+  <button onclick="nextQuestion()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Next Question</button>
+</div>
+
+<!-- RESULTS SECTION -->
+<div class="quiz-container hidden p-6 max-w-3xl mx-auto" id="results-section">
+  <h2 class="text-2xl font-bold mb-4">Quiz Results</h2>
+  <canvas id="progressChart"></canvas>
+  <div class="pagination mt-2" id="chartPagination"></div>
+  <label class="block mt-4"><input type="checkbox" id="filterIncorrect" onchange="drawChart()"> Show only incorrect terms</label>
+  <div id="accordion" class="mt-4"></div>
+
+  <!-- ANSWER BREAKDOWN -->
+  <div class="mt-6">
+    <h3 class="text-xl font-semibold mb-4">Answer Breakdown</h3>
+    <ul id="answer-breakdown" class="space-y-3"></ul>
+  </div>
+
+  <button onclick="restartQuiz()" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Restart Quiz</button>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md text-center">
+    <p id="feedbackText" class="text-lg font-semibold"></p>
+    <button onclick="closeFeedbackModal()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">OK</button>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc",
+  authDomain: "itilmcq.firebaseapp.com",
+  projectId: "itilmcq",
+  storageBucket: "itilmcq.appspot.com",
+  messagingSenderId: "535085938419",
+  appId: "1:535085938419:web:8549b9b3d11dd26a756986",
+  measurementId: "G-PW7SPRRLVW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const ADMIN_EMAIL = "salleh@gmail.com";
+
+function firebaseLogin() {
+  const emailInput = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorEl = document.getElementById('login-error');
+
+  if (emailInput.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    localStorage.setItem("isAdmin", "true");
+  } else {
+    localStorage.removeItem("isAdmin");
+  }
+
+  auth.signInWithEmailAndPassword(emailInput, password)
+    .then(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+      showLogout(true);
+    })
+    .catch(() => {
+      auth.createUserWithEmailAndPassword(emailInput, password)
+        .then(() => {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('start-screen').style.display = 'block';
+        })
+        .catch(error => errorEl.textContent = error.message);
+    });
+}
     }
+  });
+}
 
-    function startQuiz() {
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('quiz-section').style.display = 'block';
-      questionEl = document.getElementById('question');
-      optionsEl = document.getElementById('options');
-      scoreEl = document.getElementById('score');
-      timerEl = document.getElementById('timer');
-      iconEl = document.getElementById('icon');
-      score = 0; current = 0; seconds = 0;
-      userProgress.length = 0;
-      startTimer();
+function renderAnswerBreakdown() {
+  const list = document.getElementById('answer-breakdown');
+  list.innerHTML = '';
+  userProgress.forEach((entry, index) => {
+    const li = document.createElement('li');
+    li.className = 'p-4 rounded shadow border bg-white';
+    li.innerHTML = `
+      <p class="font-semibold">Q${index + 1}: ${entry.question}</p>
+      <p class="mt-1">Your answer: <span class="${entry.selected === entry.correct ? 'text-green-600' : 'text-red-600'}">${entry.selected}</span></p>
+      <p>Correct answer: <span class="text-green-700">${entry.correct}</span></p>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function loadQuestion() {
+  if (current >= quizData.length) return;
+  const q = quizData[current];
+  questionEl.textContent = q.question;
+  iconEl.src = q.icon;
+  optionsEl.innerHTML = '';
+
+  q.options.forEach(option => {
+    const btn = document.createElement('button');
+    btn.textContent = option;
+    btn.className = 'border rounded px-4 py-2 text-left bg-white hover:bg-gray-100';
+    btn.onclick = () => {
+      if (option === q.correct_answer) {
+        score++;
+        btn.classList.add('bg-green-200');
+        showFeedbackModal("Correct! 🎉");
+      } else {
+        btn.classList.add('bg-red-200');
+        showFeedbackModal(`Incorrect. Correct answer: ${q.correct_answer}`);
+      }
+      userProgress.push({ question: q.question, selected: option, correct: q.correct_answer });
+      scoreEl.textContent = `Score: ${score}/${quizData.length}`;
+    };
+    optionsEl.appendChild(btn);
+  });
+}
+
+function nextQuestion() {
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    clearInterval(timerInterval);
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('results-section').style.display = 'block';
+    drawChart();
+    renderAnswerBreakdown();
+    localStorage.setItem("progress_user", JSON.stringify(userProgress));
+
+    // Save session to Firestore
+    const user = auth.currentUser;
+    if (user) {
+      db.collection("quizResults").add({
+        uid: user.uid,
+        email: user.email,
+        timestamp: new Date(),
+        score: score,
+        total: quizData.length,
+        duration: seconds,
+        answers: userProgress
+      }).then(() => console.log("Quiz session saved.")).catch(err => console.error("Firestore error:", err));
+    }
+  }
+  }
+}
+
+function startQuiz() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-section').style.display = 'block';
+  showLogout(true);
+  questionEl = document.getElementById('question');
+  optionsEl = document.getElementById('options');
+  scoreEl = document.getElementById('score');
+  timerEl = document.getElementById('timer');
+  iconEl = document.getElementById('icon');
+  score = 0; current = 0; seconds = 0;
+  userProgress.length = 0;
+  startTimer();
+
+  fetch('/itil-quiz/itil_data_10_final_with_difficulty.json')
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load JSON");
+      return res.json();
+    })
+    .then(allData => {
+      // Adaptive logic based on previous answer accuracy
+let difficulty = 'medium'; // starting point
+const correctCount = userProgress.filter(p => p.selected === p.correct).length;
+if (correctCount >= 7) difficulty = 'hard';
+else if (correctCount <= 3) difficulty = 'easy';
+
+const filteredByDifficulty = allData.filter(q => q.difficulty === difficulty);
+const selected = (filteredByDifficulty.length >= 10 ? filteredByDifficulty : allData)
+  .sort(() => 0.5 - Math.random())
+  .slice(0, 10);
+      quizData = selected.map(item => {
+  const distractors = allData
+    .filter(d => d.term !== item.term)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3)
+    .map(d => d.term);
+  const iconPath = item.icon ? `/assets/images/${encodeURIComponent(item.icon.replace(/ /g, '_'))}` : 'default.png';
+  return {
+    question: item.definition,
+    correct_answer: item.term,
+    icon: iconPath,
+    options: [...distractors, item.term].sort(() => 0.5 - Math.random()),
+    difficulty: item.difficulty || 'medium'
+  };
+});
       loadQuestion();
-    }
+    })
+    .catch(err => {
+      questionEl.textContent = "Error loading quiz data.";
+      console.error("Error loading quiz data:", err);
+    });
+}
+</script>
+<!-- GLOBAL LOGOUT FUNCTION -->
 
-    function loadQuestion() {
-      const q = quizData[current];
-      questionEl.innerHTML = `<strong>Definition:</strong> ${q.question}`;
-      iconEl.src = q.icon || 'default.png';
-      iconEl.onerror = () => { iconEl.src = 'default.png'; };
-      optionsEl.innerHTML = '';
-      q.options.forEach(option => {
-        const btn = document.createElement('button');
-        btn.innerText = option;
-        btn.onclick = function handleClick() {
-          if (btn.disabled) return;
-          Array.from(optionsEl.children).forEach(b => {
-            b.disabled = true;
-            b.classList.add('disabled');
-          });
-          checkAnswer(option, q.correct_answer, q.question);
-        };
-        optionsEl.appendChild(btn);
-      });
-    }
-
-    function checkAnswer(selected, correct, questionText) {
-      const isCorrect = selected === correct;
-      alert(isCorrect ? '✅ Correct!' : `❌ Wrong! Correct answer: ${correct}`);
-      if (isCorrect) score++;
-      userProgress.push({ user: currentUser, question: questionText, term: correct, selected, correct: isCorrect, timestamp: new Date().toISOString() });
-      scoreEl.innerText = `Score: ${score} / ${current + 1}`;
-    }
-
-    function nextQuestion() {
-      current++;
-      if (current >= quizData.length) {
-        clearInterval(timerInterval);
-        alert(`Quiz complete! Your score: ${score}/${quizData.length}. Time: ${formatTime(seconds)}`);
-        localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
-        drawChart();
-      } else {
-        loadQuestion();
-      }
-    }
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      seconds = 0;
-      timerInterval = setInterval(() => {
-        seconds++;
-        timerEl.innerText = `Time: ${formatTime(seconds)}`;
-        if (seconds >= 3600) {
-          clearInterval(timerInterval);
-          alert(`⏰ Time's up! Final score: ${score}/${quizData.length}`);
-        }
-      }, 1000);
-    }
-
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60), s = sec % 60;
-      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-
-    function drawChart(page = 0, pageSize = 10) {
-      const counts = {};
-      userProgress.forEach(entry => {
-        if (!counts[entry.term]) counts[entry.term] = { correct: 0, incorrect: 0, definition: entry.question };
-        entry.correct ? counts[entry.term].correct++ : counts[entry.term].incorrect++;
-      });
-      let labels = Object.keys(counts);
-      if (document.getElementById('filterIncorrect').checked) {
-        labels = labels.filter(label => counts[label].incorrect > 0);
-      }
-      const currentPage = labels.slice(page * pageSize, (page + 1) * pageSize);
-      const correctData = currentPage.map(label => counts[label].correct);
-      const incorrectData = currentPage.map(label => counts[label].incorrect);
-      const ctx = document.getElementById('progressChart');
-      if (window.chartInstance) window.chartInstance.destroy();
-      window.chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: currentPage,
-          datasets: [
-            { label: 'Correct', data: correctData, backgroundColor: 'rgba(75,192,192,0.7)' },
-            { label: 'Incorrect', data: incorrectData, backgroundColor: 'rgba(255,99,132,0.7)' }
-          ]
-        },
-        options: {
-          plugins: { legend: { position: 'top' }, title: { display: true, text: 'Progress by Term' } }
-        }
-      });
-      const pagination = document.getElementById('chartPagination');
-      pagination.innerHTML = `
-        <button onclick="drawChart(${page - 1})" ${page <= 0 ? 'disabled' : ''}>⬅ Prev</button>
-        Showing terms ${page * pageSize + 1}–${Math.min((page + 1) * pageSize, labels.length)} of ${labels.length}
-        <button onclick="drawChart(${page + 1})" ${(page + 1) * pageSize >= labels.length ? 'disabled' : ''}>Next ➡</button>
-      `;
-      const accordion = document.getElementById('accordion');
-      accordion.innerHTML = '';
-      currentPage.forEach(label => {
-        const item = document.createElement('div');
-        item.className = 'accordion-item';
-        item.innerHTML = `<strong>${label}</strong>`;
-        const content = document.createElement('div');
-        content.className = 'accordion-content';
-        content.innerText = counts[label].definition;
-        item.appendChild(content);
-        item.onclick = () => {
-          content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        };
-        accordion.appendChild(item);
-      });
-    }
-
-    window.nextQuestion = nextQuestion;
-    window.drawChart = drawChart;
-  </script>
 </body>
 </html>
