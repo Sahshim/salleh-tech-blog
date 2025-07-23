@@ -65,7 +65,39 @@
 </div>
 
 <script>
-// Your existing script content for firebaseConfig, auth, Firestore, quiz logic, and UI control should remain here.
+const firebaseConfig = {
+  apiKey: "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc",
+  authDomain: "itilmcq.firebaseapp.com",
+  projectId: "itilmcq",
+  storageBucket: "itilmcq.appspot.com",
+  messagingSenderId: "535085938419",
+  appId: "1:535085938419:web:8549b9b3d11dd26a756986",
+  measurementId: "G-PW7SPRRLVW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+function firebaseLogin() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorEl = document.getElementById('login-error');
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'block';
+    })
+    .catch(() => {
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('start-screen').style.display = 'block';
+        })
+        .catch(error => errorEl.textContent = error.message);
+    });
+}
 </script>
 
 </body>
