@@ -36,7 +36,8 @@ This is an internal-use quiz app created to help students and IT professionals p
 
 ---
 
-## 📎 Contact
+<a href="https://salleh.cloud/contact/">Contact Me</a>
+
 
 For internal access or training use only. Maintained by **Salleh Ahshim**.  
 Please do not redistribute or publicly share without prior authorization.
