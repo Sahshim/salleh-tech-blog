@@ -1,6 +1,7 @@
 ---
 layout: home
 title: Welcome to Salleh Cloud Labs
+noindex: true
 ---
 
 <section>
