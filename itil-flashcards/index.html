@@ -3,27 +3,45 @@ layout: default
 permalink: /itil-flashcards/
 ---
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
 <h1>🧠 ITIL FlashCards</h1>
 
-<input type="text" id="searchInput" placeholder="Search term or definition..." oninput="searchFlashcards()" />
-<button onclick="shuffleCards()">🃏 Shuffle</button>
-<select id="categoryFilter" onchange="filterByCategory()">
-  <option value="all">All Categories</option>
-</select>
+<!-- Login Section -->
+<div id="login-section">
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="firebaseLogin()">Login / Register</button>
+  <p id="login-error" style="color: red;"></p>
+</div>
 
-<div id="flashcard-container">
-  <div id="flashcard" onclick="flipCard()">
-    <div id="card-front" class="card-side"></div>
-    <div id="card-back" class="card-side hidden"></div>
-  </div>
+<!-- Flashcard App -->
+<div id="flashcard-app" style="display: none;">
+  <button onclick="firebaseLogout()" style="float:right;">🔒 Logout</button>
+  <br /><br />
+  <input type="text" id="searchInput" placeholder="Search term or definition..." oninput="searchFlashcards()" />
+  <button onclick="shuffleCards()">🃏 Shuffle</button>
+  <select id="categoryFilter" onchange="filterByCategory()">
+    <option value="all">All Categories</option>
+  </select>
 
-  <div class="controls">
-    <button onclick="prevCard()">⬅️ Previous</button>
-    <button onclick="flipCard()">🔁 Flip</button>
-    <button onclick="nextCard()">➡️ Next</button>
+  <div id="flashcard-container">
+    <div id="flashcard" onclick="flipCard()">
+      <div id="card-front" class="card-side"></div>
+      <div id="card-back" class="card-side hidden"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="prevCard()">⬅️ Previous</button>
+      <button onclick="flipCard()">🔁 Flip</button>
+      <button onclick="nextCard()">➡️ Next</button>
+    </div>
   </div>
 </div>
 
+<!-- Styles -->
 <style>
   #flashcard-container {
     text-align: center;
@@ -67,11 +85,64 @@ permalink: /itil-flashcards/
   }
 </style>
 
+<!-- Data -->
 <script src="/assets/js/itil_flashcards_data.js"></script>
+
+<!-- Logic -->
 <script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc",
+    authDomain: "itilmcq.firebaseapp.com",
+    projectId: "itilmcq",
+    storageBucket: "itilmcq.appspot.com",
+    messagingSenderId: "535085938419",
+    appId: "1:535085938419:web:8549b9b3d11dd26a756986",
+    measurementId: "G-PW7SPRRLVW"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Login function
+  function firebaseLogin() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorEl = document.getElementById("login-error");
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => showFlashcards())
+      .catch(() => {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(() => showFlashcards())
+          .catch(error => errorEl.textContent = error.message);
+      });
+  }
+
+  // Logout function
+  function firebaseLogout() {
+    auth.signOut().then(() => {
+      document.getElementById("flashcard-app").style.display = "none";
+      document.getElementById("login-section").style.display = "block";
+    });
+  }
+
+  // Auth state
+  auth.onAuthStateChanged(user => {
+    if (user) showFlashcards();
+  });
+
+  // Flashcard logic
   let currentCardIndex = 0;
   let showingFront = true;
-  let filteredFlashcards = [...flashcards];
+  let filteredFlashcards = [];
+
+  function showFlashcards() {
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("flashcard-app").style.display = "block";
+    filteredFlashcards = [...flashcards];
+    populateCategories();
+    renderCard();
+  }
 
   function renderCard() {
     const card = filteredFlashcards[currentCardIndex];
@@ -150,7 +221,4 @@ permalink: /itil-flashcards/
       filter.appendChild(opt);
     });
   }
-
-  populateCategories();
-  renderCard();
 </script>
