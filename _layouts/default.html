@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% if page.noindex %}
+  <meta name="robots" content="noindex, nofollow">
+{% endif %}
+
   <meta charset="utf-8" />
   <title>{{ page.title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
