@@ -87,7 +87,6 @@ permalink: /itil-flashcards/
 
 <!-- Logic -->
 <script>
-  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc",
     authDomain: "itilmcq.firebaseapp.com",
@@ -100,12 +99,11 @@ permalink: /itil-flashcards/
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // Flashcards data
   let flashcards = [];
   fetch("https://sallehitilflashcard.web.app/data/itil_flashcards_data.json")
     .then(res => res.json())
     .then(data => {
-      flashcards = data;
+      flashcards = data.flashcards || data;
       if (auth.currentUser) showFlashcards();
     })
     .catch(err => {
