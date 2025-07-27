@@ -85,9 +85,6 @@ permalink: /itil-flashcards/
   }
 </style>
 
-<!-- Data -->
-<script src="/assets/js/itil_flashcards_data.js"></script>
-
 <!-- Logic -->
 <script>
   // Firebase config
@@ -103,7 +100,18 @@ permalink: /itil-flashcards/
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // Login function
+  // Flashcards data
+  let flashcards = [];
+  fetch("/data/itil_flashcards_data.json")
+    .then(res => res.json())
+    .then(data => {
+      flashcards = data;
+      if (auth.currentUser) showFlashcards();
+    })
+    .catch(err => {
+      document.getElementById("login-error").textContent = "⚠️ Failed to load flashcard data.";
+    });
+
   function firebaseLogin() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -118,7 +126,6 @@ permalink: /itil-flashcards/
       });
   }
 
-  // Logout function
   function firebaseLogout() {
     auth.signOut().then(() => {
       document.getElementById("flashcard-app").style.display = "none";
@@ -126,12 +133,10 @@ permalink: /itil-flashcards/
     });
   }
 
-  // Auth state
   auth.onAuthStateChanged(user => {
-    if (user) showFlashcards();
+    if (user && flashcards.length) showFlashcards();
   });
 
-  // Flashcard logic
   let currentCardIndex = 0;
   let showingFront = true;
   let filteredFlashcards = [];
