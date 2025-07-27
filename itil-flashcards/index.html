@@ -102,7 +102,7 @@ permalink: /itil-flashcards/
 
   // Flashcards data
   let flashcards = [];
-  fetch("/data/itil_flashcards_data.json")
+  fetch("https://sallehitilflashcard.web.app/data/itil_flashcards_data.json")
     .then(res => res.json())
     .then(data => {
       flashcards = data;
