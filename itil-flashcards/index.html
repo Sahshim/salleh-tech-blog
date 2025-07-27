@@ -100,10 +100,10 @@ permalink: /itil-flashcards/
   const auth = firebase.auth();
 
   let flashcards = [];
-  fetch("https://sallehitilflashcard.web.app/data/itil_flashcards_data.json")
+  fetch("/data/itil_flashcards_data.json")
     .then(res => res.json())
     .then(data => {
-      flashcards = data.flashcards || data;
+      flashcards = data;
       if (auth.currentUser) showFlashcards();
     })
     .catch(err => {
