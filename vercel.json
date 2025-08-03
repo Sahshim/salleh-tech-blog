@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/google-api-key.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/google-api-key", "dest": "api/google-api-key.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

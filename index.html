@@ -1,0 +1,241 @@
+---
+layout: default
+permalink: /itil-flashcards/
+---
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+<h1>💡 ITIL FlashCards</h1>
+
+<!-- Login Section -->
+<div id="login-section">
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="firebaseLogin()">Login / Register</button>
+  <p id="login-error" style="color: red;"></p>
+</div>
+
+<!-- Flashcard App -->
+<div id="flashcard-app" style="display: none;">
+  <button onclick="firebaseLogout()" style="float:right;">🔒 Logout</button>
+  <br /><br />
+  <input type="text" id="searchInput" placeholder="Search term or definition..." oninput="searchFlashcards()" />
+  <button onclick="shuffleCards()">🃏 Shuffle</button>
+  <select id="categoryFilter" onchange="filterByCategory()">
+    <option value="all">All Categories</option>
+  </select>
+
+  <div id="flashcard-container">
+    <div id="flashcard" onclick="flipCard()">
+      <div id="card-front" class="card-side"></div>
+      <div id="card-back" class="card-side hidden"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="prevCard()">⬅️ Previous</button>
+      <button onclick="flipCard()">🔁 Flip</button>
+      <button onclick="nextCard()">➡️ Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- Styles -->
+<style>
+  #flashcard-container {
+    text-align: center;
+    margin: 40px auto;
+    max-width: 600px;
+  }
+
+  #flashcard {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    font-size: 1.2em;
+    cursor: pointer;
+    min-height: 150px;
+  }
+
+  .card-side {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .controls {
+    margin-top: 20px;
+  }
+
+  button {
+    margin: 5px;
+    padding: 10px 16px;
+    font-size: 1em;
+  }
+
+  #searchInput {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 60%;
+    font-size: 1em;
+  }
+</style>
+
+<!-- Logic -->
+<script>
+  async function initializeFirebase() {
+    try {
+      const response = await fetch("https://your-vercel-app.vercel.app/api/google-api-key");
+      const data = await response.json();
+      const firebaseConfig = {
+        apiKey: data.apiKey,
+        authDomain: "itilmcq.firebaseapp.com",
+        projectId: "itilmcq",
+        storageBucket: "itilmcq.appspot.com",
+        messagingSenderId: "535085938419",
+        appId: "1:535085938419:web:8549b9b3d11dd26a756986",
+        measurementId: "G-PW7SPRRLVW"
+      };
+      firebase.initializeApp(firebaseConfig);
+      runApp();
+    } catch (error) {
+      document.getElementById("login-error").textContent = "⚠️ Failed to initialize Firebase.";
+    }
+  }
+
+  initializeFirebase();
+
+  function runApp() {
+    const auth = firebase.auth();
+
+    let flashcards = [];
+    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=3ff919c0-c2fe-4c17-82f5-4ef9ed44bef6")
+      .then(res => res.json())
+      .then(data => {
+        flashcards = data;
+        if (auth.currentUser) showFlashcards();
+      })
+      .catch(err => {
+        document.getElementById("login-error").textContent = "⚠️ Failed to load flashcard data.";
+      });
+
+    function firebaseLogin() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("login-error");
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => showFlashcards())
+        .catch(() => {
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(() => showFlashcards())
+            .catch(error => errorEl.textContent = error.message);
+        });
+    }
+
+    function firebaseLogout() {
+      auth.signOut().then(() => {
+        document.getElementById("flashcard-app").style.display = "none";
+        document.getElementById("login-section").style.display = "block";
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user && flashcards.length) showFlashcards();
+    });
+
+    let currentCardIndex = 0;
+    let showingFront = true;
+    let filteredFlashcards = [];
+
+    function showFlashcards() {
+      document.getElementById("login-section").style.display = "none";
+      document.getElementById("flashcard-app").style.display = "block";
+      filteredFlashcards = [...flashcards];
+      populateCategories();
+      renderCard();
+    }
+
+    function renderCard() {
+      const card = filteredFlashcards[currentCardIndex];
+      const cardFront = document.getElementById("card-front");
+      const cardBack = document.getElementById("card-back");
+
+      if (!card) {
+        cardFront.innerText = "⚠️ No flashcards available.";
+        cardBack.innerText = "";
+        return;
+      }
+
+      cardFront.innerText = card.term;
+      cardBack.innerText = card.definition;
+    }
+
+    function flipCard() {
+      document.getElementById("card-front").classList.toggle("hidden");
+      document.getElementById("card-back").classList.toggle("hidden");
+      showingFront = !showingFront;
+    }
+
+    function nextCard() {
+      currentCardIndex = (currentCardIndex + 1) % filteredFlashcards.length;
+      if (!showingFront) flipCard();
+      renderCard();
+    }
+
+    function prevCard() {
+      currentCardIndex = (currentCardIndex - 1 + filteredFlashcards.length) % filteredFlashcards.length;
+      if (!showingFront) flipCard();
+      renderCard();
+    }
+
+    function shuffleCards() {
+      for (let i = filteredFlashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredFlashcards[i], filteredFlashcards[j]] = [filteredFlashcards[j], filteredFlashcards[i]];
+      }
+      currentCardIndex = 0;
+      renderCard();
+    }
+
+    function searchFlashcards() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      filteredFlashcards = flashcards.filter(card =>
+        card.term.toLowerCase().includes(query) ||
+        card.definition.toLowerCase().includes(query)
+      );
+      currentCardIndex = 0;
+      renderCard();
+    }
+
+    function filterByCategory() {
+      const category = document.getElementById("categoryFilter").value;
+      if (category === "all") {
+        filteredFlashcards = [...flashcards];
+      } else {
+        filteredFlashcards = flashcards.filter(card => card.term.toLowerCase().includes(category));
+      }
+      currentCardIndex = 0;
+      renderCard();
+    }
+
+    function populateCategories() {
+      const filter = document.getElementById("categoryFilter");
+      const keywords = new Set();
+      flashcards.forEach(card => {
+        const word = card.term.split(" ")[0].toLowerCase();
+        if (word.length > 3) keywords.add(word);
+      });
+      [...keywords].sort().forEach(keyword => {
+        const opt = document.createElement("option");
+        opt.value = keyword;
+        opt.textContent = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+        filter.appendChild(opt);
+      });
+    }
+  }
+</script>
