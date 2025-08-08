@@ -3,6 +3,11 @@ layout: default
 permalink: /itil-flashcards/
 ---
 
+<!-- Firebase API Key Injection -->
+<script>
+  window.FIREBASE_API_KEY = "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc";
+</script>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -88,7 +93,7 @@ permalink: /itil-flashcards/
 <!-- Logic -->
 <script>
   const firebaseConfig = {
-    apiKey: "AIzaSyCUNFsjKD4IvLCmhkkKcMnq5f2-Hlln_YU",
+    apiKey: window.FIREBASE_API_KEY || "",
     authDomain: "itilmcq.firebaseapp.com",
     projectId: "itilmcq",
     storageBucket: "itilmcq.appspot.com",
