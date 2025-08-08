@@ -87,27 +87,18 @@ permalink: /itil-flashcards/
 
 <!-- Logic -->
 <script>
-  async function initializeFirebase() {
-    try {
-      const response = await fetch("https://salleh-tech-blog-git-flashcard-066250-sallehs-projects-11269afb.vercel.app/api/google-api-key");
-      const data = await response.json();
-      const firebaseConfig = {
-        apiKey: data.apiKey,
-        authDomain: "itilmcq.firebaseapp.com",
-        projectId: "itilmcq",
-        storageBucket: "itilmcq.appspot.com",
-        messagingSenderId: "535085938419",
-        appId: "1:535085938419:web:8549b9b3d11dd26a756986",
-        measurementId: "G-PW7SPRRLVW"
-      };
-      firebase.initializeApp(firebaseConfig);
-      runApp();
-    } catch (error) {
-      document.getElementById("login-error").textContent = "⚠️ Failed to initialize Firebase.";
-    }
-  }
+  const firebaseConfig = {
+    apiKey: "AIzaSyCUNFsjKD4IvLCmhkkKcMnq5f2-Hlln_YU",
+    authDomain: "itilmcq.firebaseapp.com",
+    projectId: "itilmcq",
+    storageBucket: "itilmcq.appspot.com",
+    messagingSenderId: "535085938419",
+    appId: "1:535085938419:web:8549b9b3d11dd26a756986",
+    measurementId: "G-PW7SPRRLVW"
+  };
 
-  initializeFirebase();
+  firebase.initializeApp(firebaseConfig);
+  runApp();
 
   function runApp() {
     const auth = firebase.auth();
