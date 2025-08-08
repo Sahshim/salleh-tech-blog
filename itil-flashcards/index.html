@@ -134,7 +134,7 @@ permalink: /itil-flashcards/
     const auth = firebase.auth();
 
     let flashcards = [];
-    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media")
+    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media")
       .then(res => res.json())
       .then(data => {
         flashcards = data;
