@@ -111,11 +111,11 @@ permalink: /itil-flashcards/
     const errorEl = document.getElementById("login-error");
 
     firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => showFlashcards())
+      .then(() => window.showFlashcards())
       .catch(err => {
         if (err.code === 'auth/user-not-found') {
           firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(() => showFlashcards())
+            .then(() => window.showFlashcards())
             .catch(error => errorEl.textContent = error.message);
         } else {
           errorEl.textContent = err.message;
@@ -138,21 +138,21 @@ permalink: /itil-flashcards/
       .then(res => res.json())
       .then(data => {
         flashcards = data;
-        if (auth.currentUser) showFlashcards();
+        if (auth.currentUser) window.showFlashcards();
       })
       .catch(err => {
         document.getElementById("login-error").textContent = "⚠️ Failed to load flashcard data.";
       });
 
     auth.onAuthStateChanged(user => {
-      if (user && flashcards.length) showFlashcards();
+      if (user && flashcards.length) window.showFlashcards();
     });
 
     let currentCardIndex = 0;
     let showingFront = true;
     let filteredFlashcards = [];
 
-    function showFlashcards() {
+    window.showFlashcards = function () {
       document.getElementById("login-section").style.display = "none";
       document.getElementById("flashcard-app").style.display = "block";
       filteredFlashcards = [...flashcards];
