@@ -112,10 +112,14 @@ permalink: /itil-flashcards/
 
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(() => showFlashcards())
-      .catch(() => {
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then(() => showFlashcards())
-          .catch(error => errorEl.textContent = error.message);
+      .catch(err => {
+        if (err.code === 'auth/user-not-found') {
+          firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(() => showFlashcards())
+            .catch(error => errorEl.textContent = error.message);
+        } else {
+          errorEl.textContent = err.message;
+        }
       });
   }
 
