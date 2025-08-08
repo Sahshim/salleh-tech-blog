@@ -100,6 +100,27 @@ permalink: /itil-flashcards/
   firebase.initializeApp(firebaseConfig);
   runApp();
 
+  function firebaseLogin() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorEl = document.getElementById("login-error");
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(() => showFlashcards())
+      .catch(() => {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then(() => showFlashcards())
+          .catch(error => errorEl.textContent = error.message);
+      });
+  }
+
+  function firebaseLogout() {
+    firebase.auth().signOut().then(() => {
+      document.getElementById("flashcard-app").style.display = "none";
+      document.getElementById("login-section").style.display = "block";
+    });
+  }
+
   function runApp() {
     const auth = firebase.auth();
 
@@ -113,27 +134,6 @@ permalink: /itil-flashcards/
       .catch(err => {
         document.getElementById("login-error").textContent = "⚠️ Failed to load flashcard data.";
       });
-
-    function firebaseLogin() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const errorEl = document.getElementById("login-error");
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => showFlashcards())
-        .catch(() => {
-          auth.createUserWithEmailAndPassword(email, password)
-            .then(() => showFlashcards())
-            .catch(error => errorEl.textContent = error.message);
-        });
-    }
-
-    function firebaseLogout() {
-      auth.signOut().then(() => {
-        document.getElementById("flashcard-app").style.display = "none";
-        document.getElementById("login-section").style.display = "block";
-      });
-    }
 
     auth.onAuthStateChanged(user => {
       if (user && flashcards.length) showFlashcards();
@@ -166,25 +166,25 @@ permalink: /itil-flashcards/
       cardBack.innerText = card.definition;
     }
 
-    function flipCard() {
+    window.flipCard = function () {
       document.getElementById("card-front").classList.toggle("hidden");
       document.getElementById("card-back").classList.toggle("hidden");
       showingFront = !showingFront;
     }
 
-    function nextCard() {
+    window.nextCard = function () {
       currentCardIndex = (currentCardIndex + 1) % filteredFlashcards.length;
       if (!showingFront) flipCard();
       renderCard();
     }
 
-    function prevCard() {
+    window.prevCard = function () {
       currentCardIndex = (currentCardIndex - 1 + filteredFlashcards.length) % filteredFlashcards.length;
       if (!showingFront) flipCard();
       renderCard();
     }
 
-    function shuffleCards() {
+    window.shuffleCards = function () {
       for (let i = filteredFlashcards.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [filteredFlashcards[i], filteredFlashcards[j]] = [filteredFlashcards[j], filteredFlashcards[i]];
@@ -193,7 +193,7 @@ permalink: /itil-flashcards/
       renderCard();
     }
 
-    function searchFlashcards() {
+    window.searchFlashcards = function () {
       const query = document.getElementById("searchInput").value.toLowerCase();
       filteredFlashcards = flashcards.filter(card =>
         card.term.toLowerCase().includes(query) ||
@@ -203,7 +203,7 @@ permalink: /itil-flashcards/
       renderCard();
     }
 
-    function filterByCategory() {
+    window.filterByCategory = function () {
       const category = document.getElementById("categoryFilter").value;
       if (category === "all") {
         filteredFlashcards = [...flashcards];
