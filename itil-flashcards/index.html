@@ -96,7 +96,7 @@ permalink: /itil-flashcards/
     apiKey: window.FIREBASE_API_KEY || "",
     authDomain: "itilmcq.firebaseapp.com",
     projectId: "itilmcq",
-    storageBucket: "itilmcq.appspot.com",
+    storageBucket: "sallehitilflashcard.appspot.com",
     messagingSenderId: "535085938419",
     appId: "1:535085938419:web:8549b9b3d11dd26a756986",
     measurementId: "G-PW7SPRRLVW"
@@ -134,7 +134,7 @@ permalink: /itil-flashcards/
     const auth = firebase.auth();
 
     let flashcards = [];
-    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media")
+    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media")
       .then(res => res.json())
       .then(data => {
         flashcards = data;
