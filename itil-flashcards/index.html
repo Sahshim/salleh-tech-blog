@@ -31,7 +31,7 @@
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
+      apiKey: "HIDDEN",
       authDomain: "sallehitilflashcard.firebaseapp.com",
       projectId: "sallehitilflashcard",
       storageBucket: "sallehitilflashcard.appspot.com",
@@ -58,7 +58,7 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media&token=b6ac45aa-5a72-4b3c-8ffc-74c15b35c3ad";
+      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error("Network response was not ok");
