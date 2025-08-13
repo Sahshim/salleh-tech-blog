@@ -34,7 +34,7 @@
       apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
       authDomain: "sallehitilflashcard.firebaseapp.com",
       projectId: "sallehitilflashcard",
-      storageBucket: "sallehitilflashcard.firebasestorage.app",
+      storageBucket: "sallehitilflashcard.appspot.com",
       messagingSenderId: "83258180991",
       appId: "1:83258180991:web:a17c49a403b240bfdec64a"
     };
@@ -58,7 +58,7 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media";
+      const url = "https://sallehitilflashcard.firebasestorage.app/itil_flashcards_data.json";
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error("Network response was not ok");
