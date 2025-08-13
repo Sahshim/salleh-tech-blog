@@ -31,12 +31,12 @@
 
   <script>
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
+      apiKey: "AIzaSyCdxKXoqEUedlAb5RhKzeV0KjyUZjARW8s",
       authDomain: "sallehitilflashcard.firebaseapp.com",
       projectId: "sallehitilflashcard",
       storageBucket: "sallehitilflashcard.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      messagingSenderId: "220844060821",
+      appId: "1:220844060821:web:981d265ff1c53aeb5077b3"
     };
     firebase.initializeApp(firebaseConfig);
 
@@ -58,9 +58,12 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=b6ac45aa-5a72-4b3c-8ffc-74c15b35c3ad";
+      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media";
       fetch(url)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
         .then(data => {
           flashcards = data;
           showCard();
@@ -69,6 +72,7 @@
     }
 
     function showCard() {
+      if (flashcards.length === 0) return;
       document.getElementById("term").innerText = flashcards[currentCard].term;
       document.getElementById("definition").style.display = "none";
       document.getElementById("definition").innerText = flashcards[currentCard].definition;
