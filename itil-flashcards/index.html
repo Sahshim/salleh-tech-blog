@@ -1,241 +1,87 @@
----
-layout: default
-permalink: /itil-flashcards/
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🧠 ITIL FlashCards</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+</head>
+<body>
+  <h1>🧠 ITIL FlashCards</h1>
 
-<!-- Firebase API Key Injection -->
-<script>
-  window.FIREBASE_API_KEY = "AIzaSyDejvImoxjN5WW8UxOucCasDPwPNrhoPNc";
-</script>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
-<h1>💡 ITIL FlashCards</h1>
-
-<!-- Login Section -->
-<div id="login-section">
-  <input type="email" id="email" placeholder="Email" />
-  <input type="password" id="password" placeholder="Password" />
-  <button onclick="firebaseLogin()">Login / Register</button>
-  <p id="login-error" style="color: red;"></p>
-</div>
-
-<!-- Flashcard App -->
-<div id="flashcard-app" style="display: none;">
-  <button onclick="firebaseLogout()" style="float:right;">🔒 Logout</button>
-  <br /><br />
-  <input type="text" id="searchInput" placeholder="Search term or definition..." oninput="searchFlashcards()" />
-  <button onclick="shuffleCards()">🃏 Shuffle</button>
-  <select id="categoryFilter" onchange="filterByCategory()">
-    <option value="all">All Categories</option>
-  </select>
-
-  <div id="flashcard-container">
-    <div id="flashcard" onclick="flipCard()">
-      <div id="card-front" class="card-side"></div>
-      <div id="card-back" class="card-side hidden"></div>
-    </div>
-
-    <div class="controls">
-      <button onclick="prevCard()">⬅️ Previous</button>
-      <button onclick="flipCard()">🔁 Flip</button>
-      <button onclick="nextCard()">➡️ Next</button>
-    </div>
+  <!-- Login Section -->
+  <div id="login-section">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="firebaseLogin()">Login / Register</button>
+    <p id="login-error" style="color: red;"></p>
   </div>
-</div>
 
-<!-- Styles -->
-<style>
-  #flashcard-container {
-    text-align: center;
-    margin: 40px auto;
-    max-width: 600px;
-  }
+  <!-- Flashcard App -->
+  <div id="flashcard-app" style="display:none">
+    <div id="flashcard">
+      <p id="term"></p>
+      <button onclick="showDefinition()">Show Definition</button>
+      <p id="definition" style="display:none"></p>
+    </div>
+    <button onclick="nextCard()">Next</button>
+  </div>
 
-  #flashcard {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    padding: 40px;
-    font-size: 1.2em;
-    cursor: pointer;
-    min-height: 150px;
-  }
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "sallehitilflashcard.firebaseapp.com",
+      projectId: "sallehitilflashcard",
+      storageBucket: "sallehitilflashcard.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-  .card-side {
-    transition: all 0.3s ease-in-out;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .controls {
-    margin-top: 20px;
-  }
-
-  button {
-    margin: 5px;
-    padding: 10px 16px;
-    font-size: 1em;
-  }
-
-  #searchInput {
-    margin-bottom: 15px;
-    padding: 10px;
-    width: 60%;
-    font-size: 1em;
-  }
-</style>
-
-<!-- Logic -->
-<script>
-  const firebaseConfig = {
-    apiKey: window.FIREBASE_API_KEY || "",
-    authDomain: "itilmcq.firebaseapp.com",
-    projectId: "itilmcq",
-    storageBucket: "sallehitilflashcard.appspot.com",
-    messagingSenderId: "535085938419",
-    appId: "1:535085938419:web:8549b9b3d11dd26a756986",
-    measurementId: "G-PW7SPRRLVW"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  runApp();
-
-  function firebaseLogin() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const errorEl = document.getElementById("login-error");
-
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => window.showFlashcards())
-      .catch(err => {
-        if (err.code === 'auth/user-not-found') {
-          firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(() => window.showFlashcards())
-            .catch(error => errorEl.textContent = error.message);
-        } else {
-          errorEl.textContent = err.message;
-        }
-      });
-  }
-
-  function firebaseLogout() {
-    firebase.auth().signOut().then(() => {
-      document.getElementById("flashcard-app").style.display = "none";
-      document.getElementById("login-section").style.display = "block";
-    });
-  }
-
-  function runApp() {
-    const auth = firebase.auth();
+    function firebaseLogin() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById("login-section").style.display = "none";
+          document.getElementById("flashcard-app").style.display = "block";
+          loadFlashcards();
+        })
+        .catch((error) => {
+          document.getElementById("login-error").innerText = error.message;
+        });
+    }
 
     let flashcards = [];
-    fetch("https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media")
-      .then(res => res.json())
-      .then(data => {
-        flashcards = data;
-        if (auth.currentUser) window.showFlashcards();
-      })
-      .catch(err => {
-        document.getElementById("login-error").textContent = "⚠️ Failed to load flashcard data.";
-      });
+    let currentCard = 0;
 
-    auth.onAuthStateChanged(user => {
-      if (user && flashcards.length) window.showFlashcards();
-    });
-
-    let currentCardIndex = 0;
-    let showingFront = true;
-    let filteredFlashcards = [];
-
-    window.showFlashcards = function () {
-      document.getElementById("login-section").style.display = "none";
-      document.getElementById("flashcard-app").style.display = "block";
-      filteredFlashcards = [...flashcards];
-      populateCategories();
-      renderCard();
+    function loadFlashcards() {
+      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=b6ac45aa-5a72-4b3c-8ffc-74c15b35c3ad";
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          flashcards = data;
+          showCard();
+        })
+        .catch(error => console.error("Failed to load flashcards:", error));
     }
 
-    function renderCard() {
-      const card = filteredFlashcards[currentCardIndex];
-      const cardFront = document.getElementById("card-front");
-      const cardBack = document.getElementById("card-back");
-
-      if (!card) {
-        cardFront.innerText = "⚠️ No flashcards available.";
-        cardBack.innerText = "";
-        return;
-      }
-
-      cardFront.innerText = card.term;
-      cardBack.innerText = card.definition;
+    function showCard() {
+      document.getElementById("term").innerText = flashcards[currentCard].term;
+      document.getElementById("definition").style.display = "none";
+      document.getElementById("definition").innerText = flashcards[currentCard].definition;
     }
 
-    window.flipCard = function () {
-      document.getElementById("card-front").classList.toggle("hidden");
-      document.getElementById("card-back").classList.toggle("hidden");
-      showingFront = !showingFront;
+    function showDefinition() {
+      document.getElementById("definition").style.display = "block";
     }
 
-    window.nextCard = function () {
-      currentCardIndex = (currentCardIndex + 1) % filteredFlashcards.length;
-      if (!showingFront) flipCard();
-      renderCard();
+    function nextCard() {
+      currentCard = (currentCard + 1) % flashcards.length;
+      showCard();
     }
-
-    window.prevCard = function () {
-      currentCardIndex = (currentCardIndex - 1 + filteredFlashcards.length) % filteredFlashcards.length;
-      if (!showingFront) flipCard();
-      renderCard();
-    }
-
-    window.shuffleCards = function () {
-      for (let i = filteredFlashcards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [filteredFlashcards[i], filteredFlashcards[j]] = [filteredFlashcards[j], filteredFlashcards[i]];
-      }
-      currentCardIndex = 0;
-      renderCard();
-    }
-
-    window.searchFlashcards = function () {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      filteredFlashcards = flashcards.filter(card =>
-        card.term.toLowerCase().includes(query) ||
-        card.definition.toLowerCase().includes(query)
-      );
-      currentCardIndex = 0;
-      renderCard();
-    }
-
-    window.filterByCategory = function () {
-      const category = document.getElementById("categoryFilter").value;
-      if (category === "all") {
-        filteredFlashcards = [...flashcards];
-      } else {
-        filteredFlashcards = flashcards.filter(card => card.term.toLowerCase().includes(category));
-      }
-      currentCardIndex = 0;
-      renderCard();
-    }
-
-    function populateCategories() {
-      const filter = document.getElementById("categoryFilter");
-      const keywords = new Set();
-      flashcards.forEach(card => {
-        const word = card.term.split(" ")[0].toLowerCase();
-        if (word.length > 3) keywords.add(word);
-      });
-      [...keywords].sort().forEach(keyword => {
-        const opt = document.createElement("option");
-        opt.value = keyword;
-        opt.textContent = keyword.charAt(0).toUpperCase() + keyword.slice(1);
-        filter.appendChild(opt);
-      });
-    }
-  }
-</script>
+  </script>
+</body>
+</html>
