@@ -7,26 +7,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #term {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    #definition {
-      margin-top: 10px;
-    }
-    button {
-      margin-top: 10px;
-    }
-  </style>
 </head>
 <body>
   <h1>🧠 ITIL FlashCards</h1>
 
+  <!-- Login Section -->
   <div id="login-section">
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
@@ -34,11 +19,12 @@
     <p id="login-error" style="color: red;"></p>
   </div>
 
-  <div id="flashcard-app" style="display: none;">
+  <!-- Flashcard App -->
+  <div id="flashcard-app" style="display:none">
     <div id="flashcard">
       <p id="term">Loading...</p>
       <button onclick="showDefinition()">Show Definition</button>
-      <p id="definition" style="display: none;"></p>
+      <p id="definition" style="display:none"></p>
     </div>
     <button onclick="nextCard()">Next</button>
   </div>
@@ -72,7 +58,7 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
+      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards.json?alt=media";
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error("Network response was not ok");
