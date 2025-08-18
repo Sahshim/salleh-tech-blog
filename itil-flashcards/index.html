@@ -28,7 +28,7 @@
       background-color: #f9f9f9;
       display: inline-block;
     }
-    input {
+    input, select {
       display: block;
       margin: 0.5em auto;
       padding: 0.5em;
@@ -64,6 +64,7 @@
     function displayCard() {
       const card = flashcards[currentIndex];
       document.getElementById("flashcard").textContent = showingDefinition ? card.definition : card.term;
+      document.getElementById("term-select").value = currentIndex;
     }
 
     function showDefinition() {
@@ -83,6 +84,12 @@
       displayCard();
     }
 
+    function jumpToCard(index) {
+      currentIndex = parseInt(index);
+      showingDefinition = false;
+      displayCard();
+    }
+
     function fetchFlashcards() {
       fetch(flashcardUrl)
         .then(response => {
@@ -91,6 +98,8 @@
         })
         .then(data => {
           flashcards = data;
+          const dropdown = document.getElementById("term-select");
+          dropdown.innerHTML = flashcards.map((card, index) => `<option value="${index}">${card.term}</option>`).join("");
           displayCard();
         })
         .catch(error => {
@@ -123,6 +132,7 @@
     document.getElementById("show-definition-btn").addEventListener("click", showDefinition);
     document.getElementById("next-btn").addEventListener("click", nextCard);
     document.getElementById("prev-btn").addEventListener("click", previousCard);
+    document.getElementById("term-select").addEventListener("change", e => jumpToCard(e.target.value));
 
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -141,6 +151,8 @@
 
   <div class="card" id="flashcard-container" style="display: none;">
     <div id="flashcard">Loading...</div>
+    <br />
+    <select id="term-select"></select>
     <br />
     <button id="show-definition-btn">Show Definition</button>
     <button id="prev-btn">Back</button>
