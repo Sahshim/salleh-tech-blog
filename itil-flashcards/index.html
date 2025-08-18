@@ -22,9 +22,9 @@
   <!-- Flashcard App -->
   <div id="flashcard-app" style="display:none">
     <div id="flashcard">
-      <p id="term"></p>
+      <p id="card-term">Loading...</p>
       <button onclick="showDefinition()">Show Definition</button>
-      <p id="definition" style="display:none"></p>
+      <p id="card-definition" style="display:none"></p>
     </div>
     <button onclick="nextCard()">Next</button>
   </div>
@@ -58,7 +58,6 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-
       const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
       fetch(url)
         .then(response => {
@@ -74,13 +73,13 @@
 
     function showCard() {
       if (flashcards.length === 0) return;
-      document.getElementById("term").innerText = flashcards[currentCard].term;
-      document.getElementById("definition").style.display = "none";
-      document.getElementById("definition").innerText = flashcards[currentCard].definition;
+      document.getElementById("card-term").innerText = flashcards[currentCard].term;
+      document.getElementById("card-definition").style.display = "none";
+      document.getElementById("card-definition").innerText = flashcards[currentCard].definition;
     }
 
     function showDefinition() {
-      document.getElementById("definition").style.display = "block";
+      document.getElementById("card-definition").style.display = "block";
     }
 
     function nextCard() {
