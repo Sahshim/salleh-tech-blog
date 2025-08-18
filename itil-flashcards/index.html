@@ -127,6 +127,9 @@
       });
     });
 
+    document.getElementById("show-definition-btn").addEventListener("click", showDefinition);
+    document.getElementById("next-btn").addEventListener("click", nextCard);
+
     onAuthStateChanged(auth, user => {
       if (user) {
         document.getElementById("login-box").style.display = "none";
@@ -145,8 +148,8 @@
   <div class="card" id="flashcard-container" style="display: none;">
     <div id="flashcard">Loading...</div>
     <br />
-    <button onclick="showDefinition()">Show Definition</button>
-    <button onclick="nextCard()">Next</button>
+    <button id="show-definition-btn">Show Definition</button>
+    <button id="next-btn">Next</button>
     <br />
     <button id="logout-btn">Logout</button>
   </div>
