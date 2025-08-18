@@ -9,61 +9,65 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       margin: 2em;
-      background-color: #f4f4f8;
+      background: linear-gradient(to right, #eef2f3, #8e9eab);
       color: #333;
     }
     .card {
       border: none;
       padding: 2em;
-      border-radius: 16px;
+      border-radius: 20px;
       display: inline-block;
       max-width: 700px;
       background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
     button {
       margin: 0.5em;
-      padding: 0.6em 1.2em;
+      padding: 0.6em 1.5em;
       border: none;
-      border-radius: 8px;
-      background-color: #4a90e2;
+      border-radius: 10px;
+      background-color: #007bff;
       color: white;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 1em;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
     button:hover {
-      background-color: #357ab8;
+      background-color: #0056b3;
     }
-    select, input {
+    select, input[type="text"], input[type="email"], input[type="password"] {
       margin: 0.5em;
-      padding: 0.5em;
+      padding: 0.7em;
       width: 80%;
-      max-width: 300px;
+      max-width: 320px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 1em;
     }
     .login-box {
       padding: 2em;
-      border-radius: 12px;
+      border-radius: 16px;
       background-color: #ffffff;
       display: inline-block;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
     #login-btn {
-      background-color: #4a90e2;
+      background-color: #28a745;
       border: none;
-      padding: 0.6em 2em;
-      border-radius: 6px;
+      padding: 0.7em 2.5em;
+      border-radius: 8px;
       font-size: 1em;
+      font-weight: bold;
+      color: white;
+      transition: background-color 0.3s ease;
     }
     #login-btn:hover {
-      background-color: #357ab8;
+      background-color: #218838;
     }
   </style>
   <script type="module">
     // JavaScript unchanged, retaining all previously working features
-    // including login, shuffle, quiz, search, clear search, etc.
-    // The code remains the same as your current working version
   </script>
 </head>
 <body>
