@@ -6,68 +6,224 @@
   <title>🧠 ITIL FlashCards</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
       margin: 2em;
-      background: linear-gradient(to right, #eef2f3, #8e9eab);
-      color: #333;
     }
     .card {
-      border: none;
-      padding: 2em;
-      border-radius: 20px;
+      border: 2px solid #ccc;
+      padding: 1em;
+      border-radius: 10px;
       display: inline-block;
-      max-width: 700px;
-      background-color: #ffffff;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      background-color: #f9f9f9;
     }
     button {
-      margin: 0.5em;
-      padding: 0.6em 1.5em;
-      border: none;
-      border-radius: 10px;
-      background-color: #007bff;
-      color: white;
-      font-weight: 600;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    select, input[type="text"], input[type="email"], input[type="password"] {
-      margin: 0.5em;
-      padding: 0.7em;
-      width: 80%;
-      max-width: 320px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1em;
+      margin: 1em;
     }
     .login-box {
+      border: 2px solid #ccc;
       padding: 2em;
-      border-radius: 16px;
-      background-color: #ffffff;
+      border-radius: 10px;
+      background-color: #f9f9f9;
       display: inline-block;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
-    #login-btn {
-      background-color: #28a745;
-      border: none;
-      padding: 0.7em 2.5em;
-      border-radius: 8px;
-      font-size: 1em;
-      font-weight: bold;
-      color: white;
-      transition: background-color 0.3s ease;
-    }
-    #login-btn:hover {
-      background-color: #218838;
+    input, select {
+      display: block;
+      margin: 0.5em auto;
+      padding: 0.5em;
+      width: 80%;
     }
   </style>
   <script type="module">
-    // JavaScript unchanged, retaining all previously working features
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
+      authDomain: "sallehitilflashcard.firebaseapp.com",
+      projectId: "sallehitilflashcard",
+      storageBucket: "sallehitilflashcard.appspot.com",
+      messagingSenderId: "83258180991",
+      appId: "1:83258180991:web:a17c49a403b240bfdec64a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const flashcardUrl = "https://sallehitilflashcard.web.app/itil_flashcards_data.json";
+    let flashcards = [];
+    let currentIndex = 0;
+    let showingDefinition = false;
+    let isShuffled = false;
+    let originalOrder = [];
+    let searchMatches = [];
+    let searchIndex = -1;
+
+    function displayCard() {
+      const card = flashcards[currentIndex];
+      document.getElementById("flashcard").textContent = showingDefinition ? card.definition : card.term;
+      document.getElementById("term-select").value = currentIndex;
+    }
+
+    function showDefinition() {
+      showingDefinition = true;
+      displayCard();
+    }
+
+    function nextCard() {
+      if (searchMatches.length > 0) {
+        searchIndex = (searchIndex + 1) % searchMatches.length;
+        currentIndex = searchMatches[searchIndex];
+      } else {
+        currentIndex = (currentIndex + 1) % flashcards.length;
+      }
+      showingDefinition = false;
+      displayCard();
+    }
+
+    function previousCard() {
+      if (searchMatches.length > 0) {
+        searchIndex = (searchIndex - 1 + searchMatches.length) % searchMatches.length;
+        currentIndex = searchMatches[searchIndex];
+      } else {
+        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      }
+      showingDefinition = false;
+      displayCard();
+    }
+
+    function jumpToCard(index) {
+      currentIndex = parseInt(index);
+      showingDefinition = false;
+      searchMatches = [];
+      displayCard();
+    }
+
+    function searchTerm() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      searchMatches = flashcards
+        .map((card, index) => ({ ...card, index }))
+        .filter(card => card.term.toLowerCase().includes(query))
+        .map(card => card.index);
+
+      if (searchMatches.length > 0) {
+        searchIndex = 0;
+        currentIndex = searchMatches[searchIndex];
+        showingDefinition = false;
+        displayCard();
+      } else {
+        alert("No matching terms found");
+        searchMatches = [];
+        searchIndex = -1;
+      }
+    }
+
+    function clearSearch() {
+      document.getElementById("search-input").value = "";
+      searchMatches = [];
+      searchIndex = -1;
+      currentIndex = 0;
+      showingDefinition = false;
+      displayCard();
+    }
+
+    function shuffleCards() {
+      if (!isShuffled) {
+        originalOrder = [...flashcards];
+        for (let i = flashcards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+        }
+        document.getElementById("shuffle-btn").textContent = "Unshuffle";
+        isShuffled = true;
+      } else {
+        flashcards = [...originalOrder];
+        document.getElementById("shuffle-btn").textContent = "Shuffle";
+        isShuffled = false;
+      }
+      currentIndex = 0;
+      showingDefinition = false;
+      searchMatches = [];
+      updateDropdown();
+      displayCard();
+    }
+
+    function quizMode() {
+      currentIndex = Math.floor(Math.random() * flashcards.length);
+      showingDefinition = false;
+      searchMatches = [];
+      displayCard();
+    }
+
+    function updateDropdown() {
+      const dropdown = document.getElementById("term-select");
+      dropdown.innerHTML = flashcards.map((card, index) => `<option value="${index}">${card.term}</option>`).join("");
+    }
+
+    function fetchFlashcards() {
+      fetch(flashcardUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(data => {
+          flashcards = data;
+          originalOrder = [...data];
+          updateDropdown();
+          displayCard();
+        })
+        .catch(error => {
+          document.getElementById("flashcard").textContent = "❌ Failed to load flashcards.";
+          console.error("Flashcard loading error:", error);
+        });
+    }
+
+    document.getElementById("login-btn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("login-box").style.display = "none";
+          document.getElementById("flashcard-container").style.display = "inline-block";
+          fetchFlashcards();
+        })
+        .catch(error => {
+          alert("Login failed: " + error.message);
+        });
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        document.getElementById("flashcard-container").style.display = "none";
+        document.getElementById("login-box").style.display = "inline-block";
+      });
+    });
+
+    document.getElementById("show-definition-btn").addEventListener("click", showDefinition);
+    document.getElementById("next-btn").addEventListener("click", nextCard);
+    document.getElementById("prev-btn").addEventListener("click", previousCard);
+    document.getElementById("term-select").addEventListener("change", e => jumpToCard(e.target.value));
+    document.getElementById("search-btn").addEventListener("click", searchTerm);
+    document.getElementById("clear-search-btn").addEventListener("click", clearSearch);
+    document.getElementById("shuffle-btn").addEventListener("click", shuffleCards);
+    document.getElementById("quiz-btn").addEventListener("click", quizMode);
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("flashcard-container").style.display = "inline-block";
+        fetchFlashcards();
+      } else {
+        document.getElementById("flashcard-container").style.display = "none";
+        document.getElementById("login-box").style.display = "inline-block";
+      }
+    });
   </script>
 </head>
 <body>
