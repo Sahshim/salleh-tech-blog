@@ -35,30 +35,16 @@
       width: 80%;
     }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-</head>
-<body>
-  <h1>🧠 <strong>ITIL FlashCards</strong></h1>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  <div class="card" id="flashcard-container" style="display: none;">
-    <div id="flashcard">Loading...</div>
-    <br />
-    <button onclick="showDefinition()">Show Definition</button>
-    <button onclick="nextCard()">Next</button>
-    <br />
-    <button onclick="logout()">Logout</button>
-  </div>
-
-  <div class="login-box" id="login-box">
-    <p>Please login to continue:</p>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Sign Up</button>
-  </div>
-
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
       authDomain: "sallehitilflashcard.firebaseapp.com",
@@ -68,8 +54,8 @@
       appId: "1:83258180991:web:a17c49a403b240bfdec64a"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
     const flashcardUrl = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
     let flashcards = [];
@@ -108,10 +94,10 @@
         });
     }
 
-    function login() {
+    document.getElementById("login-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
+      signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           document.getElementById("login-box").style.display = "none";
           document.getElementById("flashcard-container").style.display = "inline-block";
@@ -120,28 +106,28 @@
         .catch(error => {
           alert("Login failed: " + error.message);
         });
-    }
+    });
 
-    function signup() {
+    document.getElementById("signup-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then(() => {
           alert("Account created. You can now login.");
         })
         .catch(error => {
           alert("Sign up failed: " + error.message);
         });
-    }
+    });
 
-    function logout() {
-      auth.signOut().then(() => {
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      signOut(auth).then(() => {
         document.getElementById("flashcard-container").style.display = "none";
         document.getElementById("login-box").style.display = "inline-block";
       });
-    }
+    });
 
-    auth.onAuthStateChanged(user => {
+    onAuthStateChanged(auth, user => {
       if (user) {
         document.getElementById("login-box").style.display = "none";
         document.getElementById("flashcard-container").style.display = "inline-block";
@@ -152,5 +138,25 @@
       }
     });
   </script>
+</head>
+<body>
+  <h1>🧠 <strong>ITIL FlashCards</strong></h1>
+
+  <div class="card" id="flashcard-container" style="display: none;">
+    <div id="flashcard">Loading...</div>
+    <br />
+    <button onclick="showDefinition()">Show Definition</button>
+    <button onclick="nextCard()">Next</button>
+    <br />
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  <div class="login-box" id="login-box">
+    <p>Please login to continue:</p>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="login-btn">Login</button>
+    <button id="signup-btn">Sign Up</button>
+  </div>
 </body>
 </html>
