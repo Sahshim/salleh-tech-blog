@@ -77,6 +77,12 @@
       displayCard();
     }
 
+    function previousCard() {
+      currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      showingDefinition = false;
+      displayCard();
+    }
+
     function fetchFlashcards() {
       fetch(flashcardUrl)
         .then(response => {
@@ -116,6 +122,7 @@
 
     document.getElementById("show-definition-btn").addEventListener("click", showDefinition);
     document.getElementById("next-btn").addEventListener("click", nextCard);
+    document.getElementById("prev-btn").addEventListener("click", previousCard);
 
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -136,6 +143,7 @@
     <div id="flashcard">Loading...</div>
     <br />
     <button id="show-definition-btn">Show Definition</button>
+    <button id="prev-btn">Back</button>
     <button id="next-btn">Next</button>
     <br />
     <button id="logout-btn">Logout</button>
