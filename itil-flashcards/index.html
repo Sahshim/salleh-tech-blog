@@ -62,6 +62,8 @@
     let showingDefinition = false;
     let isShuffled = false;
     let originalOrder = [];
+    let searchMatches = [];
+    let searchIndex = -1;
 
     function displayCard() {
       const card = flashcards[currentIndex];
@@ -75,13 +77,23 @@
     }
 
     function nextCard() {
-      currentIndex = (currentIndex + 1) % flashcards.length;
+      if (searchMatches.length > 0) {
+        searchIndex = (searchIndex + 1) % searchMatches.length;
+        currentIndex = searchMatches[searchIndex];
+      } else {
+        currentIndex = (currentIndex + 1) % flashcards.length;
+      }
       showingDefinition = false;
       displayCard();
     }
 
     function previousCard() {
-      currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      if (searchMatches.length > 0) {
+        searchIndex = (searchIndex - 1 + searchMatches.length) % searchMatches.length;
+        currentIndex = searchMatches[searchIndex];
+      } else {
+        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      }
       showingDefinition = false;
       displayCard();
     }
@@ -89,18 +101,26 @@
     function jumpToCard(index) {
       currentIndex = parseInt(index);
       showingDefinition = false;
+      searchMatches = []; // reset search context
       displayCard();
     }
 
     function searchTerm() {
       const query = document.getElementById("search-input").value.toLowerCase();
-      const foundIndex = flashcards.findIndex(card => card.term.toLowerCase().includes(query));
-      if (foundIndex !== -1) {
-        currentIndex = foundIndex;
+      searchMatches = flashcards
+        .map((card, index) => ({ ...card, index }))
+        .filter(card => card.term.toLowerCase().includes(query))
+        .map(card => card.index);
+
+      if (searchMatches.length > 0) {
+        searchIndex = 0;
+        currentIndex = searchMatches[searchIndex];
         showingDefinition = false;
         displayCard();
       } else {
-        alert("Term not found");
+        alert("No matching terms found");
+        searchMatches = [];
+        searchIndex = -1;
       }
     }
 
@@ -120,6 +140,7 @@
       }
       currentIndex = 0;
       showingDefinition = false;
+      searchMatches = [];
       updateDropdown();
       displayCard();
     }
@@ -127,6 +148,7 @@
     function quizMode() {
       currentIndex = Math.floor(Math.random() * flashcards.length);
       showingDefinition = false;
+      searchMatches = [];
       displayCard();
     }
 
