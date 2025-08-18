@@ -58,7 +58,8 @@
     let currentCard = 0;
 
     function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
+
+      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error("Network response was not ok");
