@@ -90,6 +90,18 @@
       displayCard();
     }
 
+    function searchTerm() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const foundIndex = flashcards.findIndex(card => card.term.toLowerCase().includes(query));
+      if (foundIndex !== -1) {
+        currentIndex = foundIndex;
+        showingDefinition = false;
+        displayCard();
+      } else {
+        alert("Term not found");
+      }
+    }
+
     function fetchFlashcards() {
       fetch(flashcardUrl)
         .then(response => {
@@ -133,6 +145,7 @@
     document.getElementById("next-btn").addEventListener("click", nextCard);
     document.getElementById("prev-btn").addEventListener("click", previousCard);
     document.getElementById("term-select").addEventListener("change", e => jumpToCard(e.target.value));
+    document.getElementById("search-btn").addEventListener("click", searchTerm);
 
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -153,6 +166,8 @@
     <div id="flashcard">Loading...</div>
     <br />
     <select id="term-select"></select>
+    <input type="text" id="search-input" placeholder="Search term..." />
+    <button id="search-btn">Search</button>
     <br />
     <button id="show-definition-btn">Show Definition</button>
     <button id="prev-btn">Back</button>
