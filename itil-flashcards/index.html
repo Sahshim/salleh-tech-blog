@@ -49,7 +49,7 @@
       apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
       authDomain: "sallehitilflashcard.firebaseapp.com",
       projectId: "sallehitilflashcard",
-      storageBucket: "sallehitilflashcard.firebasestorage.app",
+      storageBucket: "sallehitilflashcard.appspot.com",
       messagingSenderId: "83258180991",
       appId: "1:83258180991:web:a17c49a403b240bfdec64a"
     };
@@ -57,7 +57,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const flashcardUrl = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
+    const flashcardUrl = "https://sallehitilflashcard.web.app/itil_flashcards_data.json";
     let flashcards = [];
     let currentIndex = 0;
     let showingDefinition = false;
