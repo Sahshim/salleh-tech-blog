@@ -2,92 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🧠 ITIL FlashCards</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 2em;
+    }
+    .card {
+      border: 2px solid #ccc;
+      padding: 1em;
+      border-radius: 10px;
+      display: inline-block;
+      max-width: 600px;
+      background-color: #f9f9f9;
+    }
+    button {
+      margin: 1em;
+    }
+  </style>
 </head>
 <body>
   <h1>🧠 <strong>ITIL FlashCards</strong></h1>
-
-  <!-- Login Section -->
-  <div id="login-section">
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="firebaseLogin()">Login / Register</button>
-    <p id="login-error" style="color: red;"></p>
-  </div>
-
-  <!-- Flashcard App -->
-  <div id="flashcard-app" style="display:none">
-    <div id="flashcard">
-      <p id="term"></p>
-      <button onclick="showDefinition()">Show Definition</button>
-      <p id="definition" style="display:none"></p>
-    </div>
+  <div class="card">
+    <div id="flashcard">Loading...</div>
+    <br />
+    <button onclick="showDefinition()">Show Definition</button>
     <button onclick="nextCard()">Next</button>
   </div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDIvR41kwUqip4KMyn-TrTmpXuvkq3OeQM",
-      authDomain: "sallehitilflashcard.firebaseapp.com",
-      projectId: "sallehitilflashcard",
-      storageBucket: "sallehitilflashcard.appspot.com",
-      messagingSenderId: "83258180991",
-      appId: "1:83258180991:web:a17c49a403b240bfdec64a"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    function firebaseLogin() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById("login-section").style.display = "none";
-          document.getElementById("flashcard-app").style.display = "block";
-          loadFlashcards();
-        })
-        .catch((error) => {
-          document.getElementById("login-error").innerText = error.message;
-        });
-    }
+    const flashcardUrl = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
 
     let flashcards = [];
-    let currentCard = 0;
+    let currentIndex = 0;
+    let showingDefinition = false;
 
-    function loadFlashcards() {
-      const url = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.appspot.com/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
+    fetch(flashcardUrl)
+      .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+      })
+      .then(data => {
+        flashcards = data;
+        displayCard();
+      })
+      .catch(error => {
+        document.getElementById("flashcard").textContent = "❌ Failed to load flashcards.";
+        console.error("Flashcard loading error:", error);
+      });
 
-      fetch(url)
-        .then(response => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.json();
-        })
-        .then(data => {
-          flashcards = data;
-          showCard();
-        })
-        .catch(error => {
-          document.getElementById("term").innerText = "Failed to load flashcards.";
-          console.error("Flashcard loading error:", error);
-        });
-    }
-
-    function showCard() {
-      if (flashcards.length === 0) return;
-      document.getElementById("term").innerText = flashcards[currentCard].term;
-      document.getElementById("definition").style.display = "none";
-      document.getElementById("definition").innerText = flashcards[currentCard].definition;
+    function displayCard() {
+      const card = flashcards[currentIndex];
+      document.getElementById("flashcard").textContent = showingDefinition ? card.definition : card.term;
     }
 
     function showDefinition() {
-      document.getElementById("definition").style.display = "block";
+      showingDefinition = true;
+      displayCard();
     }
 
     function nextCard() {
-      currentCard = (currentCard + 1) % flashcards.length;
-      showCard();
+      currentIndex = (currentIndex + 1) % flashcards.length;
+      showingDefinition = false;
+      displayCard();
     }
   </script>
 </body>
