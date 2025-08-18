@@ -7,11 +7,26 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #term {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #definition {
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <h1>🧠 ITIL FlashCards</h1>
 
-  <!-- Login Section -->
   <div id="login-section">
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
@@ -19,12 +34,11 @@
     <p id="login-error" style="color: red;"></p>
   </div>
 
-  <!-- Flashcard App -->
-  <div id="flashcard-app" style="display:none">
+  <div id="flashcard-app" style="display: none;">
     <div id="flashcard">
-      <p id="card-term">Loading...</p>
+      <p id="term">Loading...</p>
       <button onclick="showDefinition()">Show Definition</button>
-      <p id="card-definition" style="display:none"></p>
+      <p id="definition" style="display: none;"></p>
     </div>
     <button onclick="nextCard()">Next</button>
   </div>
@@ -68,18 +82,21 @@
           flashcards = data;
           showCard();
         })
-        .catch(error => console.error("Failed to load flashcards:", error));
+        .catch(error => {
+          document.getElementById("term").innerText = "Failed to load flashcards.";
+          console.error("Failed to load flashcards:", error);
+        });
     }
 
     function showCard() {
       if (flashcards.length === 0) return;
-      document.getElementById("card-term").innerText = flashcards[currentCard].term;
-      document.getElementById("card-definition").style.display = "none";
-      document.getElementById("card-definition").innerText = flashcards[currentCard].definition;
+      document.getElementById("term").innerText = flashcards[currentCard].term;
+      document.getElementById("definition").style.display = "none";
+      document.getElementById("definition").innerText = flashcards[currentCard].definition;
     }
 
     function showDefinition() {
-      document.getElementById("card-definition").style.display = "block";
+      document.getElementById("definition").style.display = "block";
     }
 
     function nextCard() {
