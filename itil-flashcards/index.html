@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🧠 ITIL FlashCards</title>
   <style>
     body {
@@ -10,7 +10,7 @@
       text-align: center;
       margin: 2em;
     }
-    .card {
+    .card, .auth {
       border: 2px solid #ccc;
       padding: 1em;
       border-radius: 10px;
@@ -22,37 +22,43 @@
       margin: 1em;
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 </head>
 <body>
   <h1>🧠 <strong>ITIL FlashCards</strong></h1>
-  <div class="card">
+
+  <div class="auth" id="login-container">
+    <p>Please login to continue:</p>
+    <button onclick="signIn()">Login with Google</button>
+  </div>
+
+  <div class="card" id="flashcard-container" style="display:none">
     <div id="flashcard">Loading...</div>
     <br />
     <button onclick="showDefinition()">Show Definition</button>
     <button onclick="nextCard()">Next</button>
+    <br />
+    <button onclick="signOut()">Logout</button>
   </div>
 
   <script>
-    // Updated to use Firebase Hosting URL
-    const flashcardUrl = "https://sallehitilflashcard.web.app/itil_flashcards_data.json";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwZuvAXmkp1RzJeWs9LrNcmg-m1QR0zpE",
+      authDomain: "sallehitilflashcard.firebaseapp.com",
+      projectId: "sallehitilflashcard",
+      storageBucket: "sallehitilflashcard.firebasestorage.app",
+      messagingSenderId: "83258180991",
+      appId: "1:83258180991:web:a17c49a403b240bfdec64a"
+    };
 
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const flashcardUrl = "https://firebasestorage.googleapis.com/v0/b/sallehitilflashcard.firebasestorage.app/o/itil_flashcards_data.json?alt=media&token=92794f92-0417-4962-b2dc-381b853f1363";
     let flashcards = [];
     let currentIndex = 0;
     let showingDefinition = false;
-
-    fetch(flashcardUrl)
-      .then(response => {
-        if (!response.ok) throw new Error("Network response was not ok");
-        return response.json();
-      })
-      .then(data => {
-        flashcards = data;
-        displayCard();
-      })
-      .catch(error => {
-        document.getElementById("flashcard").textContent = "❌ Failed to load flashcards.";
-        console.error("Flashcard loading error:", error);
-      });
 
     function displayCard() {
       const card = flashcards[currentIndex];
@@ -69,6 +75,53 @@
       showingDefinition = false;
       displayCard();
     }
+
+    function signIn() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          document.getElementById("login-container").style.display = "none";
+          document.getElementById("flashcard-container").style.display = "block";
+          fetchFlashcards();
+        })
+        .catch(error => {
+          console.error("Login failed:", error);
+        });
+    }
+
+    function signOut() {
+      auth.signOut().then(() => {
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("flashcard-container").style.display = "none";
+      });
+    }
+
+    function fetchFlashcards() {
+      fetch(flashcardUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(data => {
+          flashcards = data;
+          displayCard();
+        })
+        .catch(error => {
+          document.getElementById("flashcard").textContent = "❌ Failed to load flashcards.";
+          console.error("Flashcard loading error:", error);
+        });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("flashcard-container").style.display = "block";
+        fetchFlashcards();
+      } else {
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("flashcard-container").style.display = "none";
+      }
+    });
   </script>
 </body>
 </html>
