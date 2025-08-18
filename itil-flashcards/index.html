@@ -101,7 +101,7 @@
     function jumpToCard(index) {
       currentIndex = parseInt(index);
       showingDefinition = false;
-      searchMatches = []; // reset search context
+      searchMatches = [];
       displayCard();
     }
 
@@ -122,6 +122,15 @@
         searchMatches = [];
         searchIndex = -1;
       }
+    }
+
+    function clearSearch() {
+      document.getElementById("search-input").value = "";
+      searchMatches = [];
+      searchIndex = -1;
+      currentIndex = 0;
+      showingDefinition = false;
+      displayCard();
     }
 
     function shuffleCards() {
@@ -201,6 +210,7 @@
     document.getElementById("prev-btn").addEventListener("click", previousCard);
     document.getElementById("term-select").addEventListener("change", e => jumpToCard(e.target.value));
     document.getElementById("search-btn").addEventListener("click", searchTerm);
+    document.getElementById("clear-search-btn").addEventListener("click", clearSearch);
     document.getElementById("shuffle-btn").addEventListener("click", shuffleCards);
     document.getElementById("quiz-btn").addEventListener("click", quizMode);
 
@@ -225,6 +235,7 @@
     <select id="term-select"></select>
     <input type="text" id="search-input" placeholder="Search term..." />
     <button id="search-btn">Search</button>
+    <button id="clear-search-btn">Clear Search</button>
     <button id="shuffle-btn">Shuffle</button>
     <button id="quiz-btn">Random Quiz</button>
     <br />
