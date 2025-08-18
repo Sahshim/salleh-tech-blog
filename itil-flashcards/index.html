@@ -65,15 +65,6 @@
     let searchMatches = [];
     let searchIndex = -1;
 
-    function fuzzyMatch(text, query) {
-      const pattern = query
-        .split("")
-        .map(ch => `(?=.*${ch})`)
-        .join("");
-      const regex = new RegExp(`${pattern}`, "i");
-      return regex.test(text);
-    }
-
     function displayCard() {
       const card = flashcards[currentIndex];
       document.getElementById("flashcard").textContent = showingDefinition ? card.definition : card.term;
@@ -118,7 +109,7 @@
       const query = document.getElementById("search-input").value.toLowerCase();
       searchMatches = flashcards
         .map((card, index) => ({ ...card, index }))
-        .filter(card => fuzzyMatch(card.term.toLowerCase(), query))
+        .filter(card => card.term.toLowerCase().includes(query))
         .map(card => card.index);
 
       if (searchMatches.length > 0) {
