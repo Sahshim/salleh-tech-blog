@@ -1,10 +1,20 @@
-title: ""
-description: ""
+title: "Salleh Ahshim"
+description: "IP Strategist-in-Training | AI Governance & GRC Practitioner | Founder, GRC.AD & FoldiePro™"
 
 show_excerpts: true
 future: true
 
 navigation:
+  - title: About
+    url: /about/
+  - title: Projects
+    url: /projects/
+  - title: Blog
+    url: /blog/
+  - title: CV
+    url: /cv/
+  - title: Contact
+    url: /contact/
   - title: Privacy
     url: /privacy/
   - title: ITIL FlashCard
