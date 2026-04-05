@@ -3,7 +3,7 @@ layout: page
 title: About
 permalink: /about/
 ---
-<img src="assets/images/SallehProHeadShot.png" alt="Salleh Ahshim" style="width:160px;height:200px;object-fit:cover;display:block;margin:0 auto;">
+<img src="/assets/images/SallehProHeadShot.png" alt="Salleh Ahshim" style="width:160px;height:200px;object-fit:cover;display:block;margin:0 auto;">
 
 
 ## Salleh Ahshim
