@@ -1,12 +1,15 @@
+
 ---
 layout: page
 title: About
 permalink: /about/
 ---
 
-![Salleh Ahshim](assets/images/SallehProHeadShot.png)
+<img src="assets/images/SallehProHeadShot.png" alt="Salleh Ahshim" style="width:100%;max-width:480px;height:auto;display:block;margin:0 auto;">
 
 ## Salleh Ahshim
+
+
 
 **I build things. Then I protect them.**
 
