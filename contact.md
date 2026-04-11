@@ -8,4 +8,4 @@ permalink: /contact/
 
 For any inquiries or collaboration opportunities, feel free to reach out:
 
-📧 **[BlogATSalleh.Cloud]**
+📧 **[salleh@ipstrategist.pro]**
